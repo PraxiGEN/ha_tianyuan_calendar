@@ -1,7 +1,7 @@
 
 {
   "domain": "tianyuan",
-  "name": "TianYuan (天元农历)",
+  "name": "天元农历",
   "codeowners": ["@hzonz"],
   "config_flow": true,
   "dependencies": [],
