@@ -1,4 +1,4 @@
-# 🌙天元农历 (TianYuan Lunar)
+# <img src="custom_components/tianyuan_lunar/brand/icon.png" width="64"> 🌙天元农历 (TianYuan Lunar)
 
 [![Release](https://img.shields.io/github/v/release/hzonz/tianyuan_lunar)](https://github.com/hzonz/tianyuan_lunar/releases)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/hzonz/tianyuan_lunar/blob/main/LICENSE)
