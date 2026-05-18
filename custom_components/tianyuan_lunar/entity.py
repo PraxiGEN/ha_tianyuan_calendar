@@ -16,10 +16,20 @@ class TianYuanBaseEntity(CoordinatorEntity[TianYuanCoordinator]):
         """初始化基类."""
         super().__init__(coordinator)
 
-        self._attr_device_info = coordinator.device_info
+    @property
+    def device_info(self):
+        # 始终指向主设备
+        return self.coordinator.device_info
 
     @property
     def available(self) -> bool:
         """判断实体是否可用."""
-        
         return super().available and self.coordinator.data is not None
+
+
+class TianYuanShushuBaseEntity(TianYuanBaseEntity):
+    """术数设备实体基类."""
+    @property
+    def device_info(self):
+        # 始终指向术数设备
+        return self.coordinator.shushu_device_info
