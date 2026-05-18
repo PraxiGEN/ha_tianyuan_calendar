@@ -13,7 +13,7 @@ from .const import (
     DOMAIN,
     CONF_REFRESH_INTERVAL,
     CONF_CUSTOM_LONGITUDE,
-    CONF_ENABLE_TCM,
+    CONF_ENABLE_SHUSHU,
     CONF_ENABLE_MORE,
     CONF_CALC_MODE,
     MODE_ST,
@@ -36,7 +36,7 @@ class TianYuanConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             options = {
                 CONF_CUSTOM_LONGITUDE: float(user_input[CONF_CUSTOM_LONGITUDE]),
                 CONF_REFRESH_INTERVAL: int(user_input[CONF_REFRESH_INTERVAL]),
-                CONF_ENABLE_TCM: False,   # 默认关闭
+                CONF_ENABLE_SHUSHU: False,   # 默认关闭
                 CONF_ENABLE_MORE: False,  # 默认关闭
                 CONF_CALC_MODE: MODE_ST,  # 默认兼容模式
             }
@@ -88,7 +88,7 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
                     )
                 ),
                 # 3. 功能开关
-                vol.Required(CONF_ENABLE_TCM, default=bool(opts.get(CONF_ENABLE_TCM, False))): selector.BooleanSelector(),
                 vol.Required(CONF_ENABLE_MORE, default=bool(opts.get(CONF_ENABLE_MORE, False))): selector.BooleanSelector(),
+                vol.Required(CONF_ENABLE_SHUSHU, default=bool(opts.get(CONF_ENABLE_SHUSHU, False))): selector.BooleanSelector(),
             })
         )
