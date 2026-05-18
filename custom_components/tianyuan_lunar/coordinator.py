@@ -1,4 +1,6 @@
 """TianYuan (天元农历) 核心协调器."""
+# 干支纪日：晚子时日柱算当天
+# 干支纪年：新年以立春节气交接的时刻起算
 from __future__ import annotations
 
 import math
@@ -11,16 +13,19 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
 # 导入外部算法库和工具类
-from .ziwuliuzhu import ZiwuLiuzhu
+from .tianyuanshushu import ZiwuLiuzhu, TianYuanShuShu, IchingLibrary
 from .const import (
     DOMAIN, 
+    LOGGER,
     CONF_REFRESH_INTERVAL, 
     CONF_CUSTOM_LONGITUDE,
-    CONF_ENABLE_TCM,
+    CONF_ENABLE_SHUSHU,
     CONF_CALC_MODE,
     MODE_ST,
     MODE_TST,
-    LOGGER
+    KEY_SHUSHU_DATA,
+    SHUSHU_MEIHUA_GUA,
+    SHUSHU_HUANGJI_GUA
 )
 
 # 导入农历库
@@ -51,6 +56,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         self.version = version
         self.view_date: date | None = None
         self.gender: str = "男"
+        self.selected_iching = None
         
         refresh_min = entry.options.get(CONF_REFRESH_INTERVAL, 1)
         
@@ -71,8 +77,21 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             manufacturer="TianYuan Lunar",
             sw_version=str(self.version),
             entry_type="service",
-            configuration_url="https://github.com/hzonz/tianyuan",
+            configuration_url="https://github.com/hzonz/tianyuan_lunar",
         )
+        
+    @property
+    def shushu_device_info(self):
+        """子设备：天元术数."""
+        from homeassistant.helpers.entity import DeviceInfo
+        return DeviceInfo(
+            identifiers={(DOMAIN, f"{self.entry.entry_id}_shushu")}, # 独立的设备 ID
+            name="TianYuan ShuShu",
+            manufacturer="TianYuan ShuShu",
+            sw_version=str(self.version),
+            entry_type="service",
+            via_device=(DOMAIN, self.entry.entry_id),
+        )        
 
     def _calculate_tst(self, dt: datetime, lon: float) -> datetime:
         """计算真太阳时 (True Solar Time)."""
@@ -89,50 +108,81 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     def _get_sync_data(self) -> TianYuanData:
         now = dt_util.now()
         is_realtime = self.view_date is None
-        calc_base = now if is_realtime else datetime.combine(self.view_date, now.time()).replace(tzinfo=now.tzinfo)
-        
-        # 1. 永远计算真太阳时
-        lon = self.entry.options.get(CONF_CUSTOM_LONGITUDE, 120.0)
-        tst_dt = self._calculate_tst(calc_base, float(lon))
-        
-        # 2. 创建两个“宇宙”
-        st_lunar = Lunar.fromDate(calc_base)  # 系统时间宇宙
-        tst_lunar = Lunar.fromDate(tst_dt)    # 真太阳时宇宙
+    
+        calc_base = (
+            now if is_realtime
+            else datetime.combine(self.view_date, now.time()).replace(tzinfo=now.tzinfo)
+        )
+    
+        # 计算真太阳时
+        lon = float(self.entry.options.get(CONF_CUSTOM_LONGITUDE, 120.0))
+        tst_dt = self._calculate_tst(calc_base, lon)
+    
+        # 创建历法宇宙
+        st_lunar = Lunar.fromDate(calc_base)
+        tst_lunar = Lunar.fromDate(tst_dt)
         solar = Solar.fromDate(tst_dt)
-        
-        # 3. 获取用户选择的模式
+    
+        # 模式选择
         calc_mode = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
-
         general_lunar = tst_lunar if calc_mode == MODE_TST else st_lunar
-
+    
+        # 构建基础数据
         data: TianYuanData = {
-            "lunar": general_lunar, 
+            "lunar": general_lunar,
             "solar": solar,
             "tst_dt": tst_dt,
             "is_realtime": is_realtime,
             "gender": self.gender,
-            
-            # 假期/节气：建议跟随系统时间（看表）
             "holiday_data": self._get_holiday_logic(st_lunar, solar, calc_base),
             "term_data": self._get_term_logic(st_lunar, solar),
-            
-            # 时辰：建议跟随系统时间
             "shichen_data": self._get_shichen_logic(st_lunar, calc_base),
             "full_attributes": self._get_full_attributes(general_lunar, solar),
             "more_entities_data": self._get_more_logic(tst_lunar, tst_dt),
-            
-            "linggui": {}, "najia": {}, "nazi": {}
+            # 术数占位符
+            "najia": {}, "linggui": {}, "nazi": {},
+            "xlr_info": {},  "iching_info": {}, "iching_display_name": "",
+            KEY_SHUSHU_DATA: {}
         }
-
-        # 子午流注
-        if self.entry.options.get(CONF_ENABLE_TCM):
-            data["najia"] = ZiwuLiuzhu.calculate_najia(tst_lunar)
-            data["linggui"] = ZiwuLiuzhu.calculate_linggui(tst_lunar, self.gender)
-            data["nazi"] = ZiwuLiuzhu.calculate_nazi(tst_dt)
+    
+        # 只有开启开关才执行深度计算
+        if self.entry.options.get(CONF_ENABLE_SHUSHU):
+            shushu_results = self._build_shushu(tst_lunar, tst_dt, solar)
+            data.update(shushu_results)
     
         return data
 
+    def _build_shushu(self, tst_lunar, tst_dt, solar):
+        """构建天元术数."""
+        # 小六壬
+        xlr_data = TianYuanShuShu.get_xiao_liu_ren(tst_lunar)
+        # 梅花易数
+        meihua_gua = TianYuanShuShu.get_meihua_gua(tst_lunar)
+        # 皇极经世
+        huangji_gua = TianYuanShuShu.get_huangji_context(tst_lunar, solar)
+    
+        target_gua = self.selected_iching or meihua_gua.get("state")
+        
+        gua_detail = IchingLibrary.get_gua(target_gua)
+    
+        return {
+
+            "najia": ZiwuLiuzhu.calculate_najia(tst_lunar),
+            "linggui": ZiwuLiuzhu.calculate_linggui(tst_lunar, self.gender),
+            "nazi": ZiwuLiuzhu.calculate_nazi(tst_dt),
+            
+            KEY_SHUSHU_DATA: {
+                SHUSHU_MEIHUA_GUA: meihua_gua,
+                SHUSHU_HUANGJI_GUA: huangji_gua,
+            },
+            "xlr_info": xlr_data,
+            "iching_display_name": target_gua, 
+            "iching_info": gua_detail
+        }
+
+
     def _get_holiday_logic(self, lunar, solar, dt):
+        """假期."""
         h = HolidayUtil.getHoliday(dt.year, dt.month, dt.day)
         state = "工作日" if h is None or h.isWork() else h.getName()
         
@@ -157,6 +207,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         }
 
     def _get_term_logic(self, lunar, solar):
+        """节气."""
         curr = lunar.getCurrentJieQi()
         next_jq = lunar.getNextJieQi()
         prev = lunar.getPrevJieQi()
@@ -171,7 +222,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         }
 
     def _get_shichen_logic(self, lunar, dt):
-        """复刻 Node-RED 十二时辰逻辑，状态显示当前时辰."""
+        """十二时辰."""
         # 1. 确定当前时辰状态 (例如: 酉时)
         current_shichen_state = f"{lunar.getTimeZhi()}时"
 
@@ -209,11 +260,43 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "data": shichen_results
         }
 
+    def _get_zodiac_relations(self, zhi: str) -> dict[str, str]:
+        """计算地支生肖的动合关系 (冲、刑、害、破、三合、六合)."""
+        # 地支对应的生肖关系表
+        relation_map = {
+            "子": {"六合": "牛", "三合": "猴 龙", "相冲": "马", "相刑": "兔", "相害": "羊", "相破": "鸡"},
+            "丑": {"六合": "鼠", "三合": "蛇 鸡", "相冲": "羊", "相刑": "狗", "相害": "马", "相破": "龙"},
+            "寅": {"六合": "猪", "三合": "马 狗", "相冲": "猴", "相刑": "蛇 猴", "相害": "蛇", "相破": "猪"},
+            "卯": {"六合": "狗", "三合": "猪 羊", "相冲": "鸡", "相刑": "鼠", "相害": "龙", "相破": "马"},
+            "辰": {"六合": "鸡", "三合": "猴 鼠", "相冲": "狗", "相刑": "龙(自刑)", "相害": "兔", "相破": "牛"},
+            "巳": {"六合": "猴", "三合": "鸡 牛", "相冲": "猪", "相刑": "虎 猴", "相害": "虎", "相破": "猴"},
+            "午": {"六合": "羊", "三合": "虎 狗", "相冲": "鼠", "相刑": "马(自刑)", "相害": "牛", "相破": "兔"},
+            "未": {"六合": "马", "三合": "猪 兔", "相冲": "丑", "相刑": "狗 丑", "相害": "鼠", "相破": "狗"},
+            "申": {"六合": "蛇", "三合": "鼠 龙", "相冲": "寅", "相刑": "虎 巳", "相害": "猪", "相破": "蛇"},
+            "酉": {"六合": "龙", "三合": "蛇 牛", "相冲": "卯", "相刑": "酉(自刑)", "相害": "狗", "相破": "鼠"},
+            "戌": {"六合": "兔", "三合": "虎 马", "相冲": "龙", "相刑": "牛 未", "相害": "鸡", "相破": "羊"},
+            "亥": {"六合": "寅", "三合": "兔 羊", "相冲": "蛇", "相刑": "亥(自刑)", "相害": "猴", "相破": "虎"},
+        }
+        return relation_map.get(zhi, {
+            "六合": "无", "三合": "无", "相冲": "无", 
+            "相刑": "无", "相害": "无", "相破": "无"
+        })
+
+    async def async_set_iching_gua(self, name: str):
+        """由 Select 实体调用"""
+        self.selected_iching = name
+        await self.async_refresh()
+
+
     def _get_more_logic(self, lunar, tst_dt):
+        """更多实体."""
         
         ba_zi = lunar.getEightChar()
         
-        gender_prefix = "乾造" if self.gender == "男" else "坤造"        
+        gender_prefix = "乾造" if self.gender == "男" else "坤造"
+        
+        day_zhi = lunar.getDayZhiExact2()
+        relations = self._get_zodiac_relations(day_zhi)
         
         return {
             # 真太阳时实体 (基于真太阳时的时辰属性)
@@ -280,10 +363,18 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             },
             
             # 冲煞实体
-            # "chongsha": {
-            #     "state": f"{lunar.getDayShengXiao()}日 冲{lunar.getDayChongDesc()} 煞{lunar.getDaySha()}",
-            #     "attributes": {}
-            # },
+            "chongsha": {
+                "state": f"{lunar.getDayShengXiao()}日 冲{lunar.getDayChongDesc()} 煞{lunar.getDaySha()}",
+                "attributes": {
+                    "当日生肖": lunar.getDayShengXiao(),
+                    "六合": relations["六合"],
+                    "三合": relations["三合"],
+                    "相冲": relations["相冲"],
+                    "相刑": relations["相刑"],
+                    "相害": relations["相害"],
+                    "相破": relations["相破"]
+                }
+            },
             
             # 星宿实体
             "xingxiu": {
@@ -307,7 +398,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         prev_jq = l.getPrevJieQi()
         next_jq = l.getNextJieQi()
         
-        # 2. 预先计算节气差字符串 (修复 NameError)
+        # 2. 预先计算节气差字符串
         target_dt = datetime.strptime(next_jq.getSolar().toYmd(), "%Y-%m-%d")
         current_dt = datetime.strptime(s.toYmd(), "%Y-%m-%d")
         diff_days = (target_dt - current_dt).days
@@ -327,12 +418,12 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "lunar": {
                 "农历": f"{l.getMonthInChinese()}月{l.getDayInChinese()}",
                 "星期": f"星期{l.getWeekInChinese()}",
-                "天干地支": f"{l.getYearInGanZhiExact()}{l.getYearShengXiaoExact()}年 {l.getMonthInGanZhiExact()}月 {l.getDayInGanZhiExact()}日",
+                "天干地支": f"{l.getYearInGanZhiExact()}{l.getYearShengXiaoExact()}年 {l.getMonthInGanZhiExact()}月 {l.getDayInGanZhiExact2()}日",
                 # "年干支": f"{l.getYearInGanZhiExact()}{l.getYearShengXiaoExact()}年",
                 # "干支": {
                 #     "年": f"{l.getYearInGanZhiExact()}年", 
                 #     "月": f"{l.getMonthInGanZhiExact()}月", 
-                #     "日": f"{l.getDayInGanZhiExact()}日"
+                #     "日": f"{l.getDayInGanZhiExact2()}日"
                 # },
                 "日禄": l.getDayLu(),
                 # "生肖": {
