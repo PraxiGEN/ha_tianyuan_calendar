@@ -22,7 +22,7 @@
           "custom_longitude": "Longitude (TST Calibration)",
           "refresh_interval": "Refresh Interval",
           "calc_mode": "Calculation Basis",
-          "enable_tcm": "Enable TCM (Ziwu Liuzhu)",
+          "enable_shushu": "Enable TianYuan ShuShu",
           "enable_more": "Enable Additional Entities"
         }
       }
@@ -51,7 +51,11 @@
       "season": { "name": "Season" },
       "linggui": { "name": "Linggui Bafa" },
       "najia": { "name": "Ziwu Najia" },
-      "nazi": { "name": "Ziwu Nazi" }
+      "nazi": { "name": "Ziwu Nazi" },
+      "xiaoliuren": { "name": "XiaoLiuRen" },
+      "huangji_gua": { "name": "HuangJiJingShi" },
+      "meihua_gua": { "name": "MeiHuaYiShu" },
+      "iching_reader": { "name": "I Ching Reader"}
     },
     "button": {
       "reset_to_today": { "name": "Reset to Today" }
@@ -62,6 +66,12 @@
         "state": {
           "男": "Male",
           "女": "Female"
+        }
+      },        
+      "iching_selector": {
+        "name": "I Ching Selector",
+        "state": {
+          "实时随动": "Real-time Sync"
         }
       }
     },
