@@ -1,6 +1,6 @@
 
 {
-  "domain": "tianyuan",
+  "domain": "tianyuan_lunar",
   "name": "天元农历",
   "codeowners": ["@hzonz"],
   "config_flow": true,

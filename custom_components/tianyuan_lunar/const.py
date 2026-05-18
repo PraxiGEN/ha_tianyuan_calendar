@@ -6,7 +6,7 @@ from typing import Final
 from homeassistant.const import Platform
 
 # 核心集成元数据
-DOMAIN: Final = "tianyuan"
+DOMAIN: Final = "tianyuan_lunar"
 LOGGER = logging.getLogger(__package__)
 
 # 支持的平台 (整合 SENSOR, SELECT, BUTTON, DATE)
