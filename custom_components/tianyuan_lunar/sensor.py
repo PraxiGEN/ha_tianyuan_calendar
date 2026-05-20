@@ -70,7 +70,7 @@ MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
         key="bazi",
         name="BaZi",
         translation_key="bazi",
-        icon="mdi:calendar",
+        icon="mdi:dna",
     ),
     TianYuanSensorEntityDescription(
         key="ganzhi",
