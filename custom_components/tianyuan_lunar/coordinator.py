@@ -78,7 +78,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             sw_version=str(self.version),
             entry_type="service",
             configuration_url="https://github.com/hzonz/tianyuan_lunar",
-            model="以日月之行，定人间岁时。",
+            model="察日月之度，定岁时之序。",
         )
         
     @property
