@@ -92,7 +92,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             sw_version=str(self.version),
             entry_type="service",
             via_device=(DOMAIN, self.entry.entry_id),
-            model="观天之道，执天之行。",
+            model="观天之道，执天之行，尽矣。",
         )        
 
     def _calculate_tst(self, dt: datetime, lon: float) -> datetime:
