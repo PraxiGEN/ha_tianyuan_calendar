@@ -78,6 +78,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             sw_version=str(self.version),
             entry_type="service",
             configuration_url="https://github.com/hzonz/tianyuan_lunar",
+            model="以日月之行，定人间岁时。",
         )
         
     @property
@@ -91,6 +92,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             sw_version=str(self.version),
             entry_type="service",
             via_device=(DOMAIN, self.entry.entry_id),
+            model="观天之道，执天之行。",
         )        
 
     def _calculate_tst(self, dt: datetime, lon: float) -> datetime:
