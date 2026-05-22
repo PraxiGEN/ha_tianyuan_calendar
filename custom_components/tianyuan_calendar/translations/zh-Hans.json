@@ -1,0 +1,87 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "天元农历 (TianYuan)",
+        "description": "请输入基础配置信息以开始。",
+        "data": {
+          "custom_longitude": "地理经度",
+          "refresh_interval": "刷新频率 (分钟)"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "天元农历只能配置一个实例。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "天元农历高级设置",
+        "data": {
+          "custom_longitude": "地理经度 (用于真太阳时校准)",
+          "refresh_interval": "刷新频率 (分钟)",
+          "calc_mode": "计算基准模式",
+          "enable_shushu": "开启天元术数",
+          "enable_more": "开启更多高级实体"
+        }
+      }
+    }
+  },
+  "selector": {
+    "calc_mode": {
+      "options": {
+        "standard": "兼容模式 (普通信息跟随系统时间)",
+        "pro": "专业模式 (所有数据基于真太阳时)"
+      }
+    }
+  },
+  "device": {
+    "tianyuan_device": {
+      "name": "天元农历"
+    }
+  },  
+  "entity": {
+    "sensor": {
+      "main_lunar": { "name": "农历" },
+      "holiday": { "name": "假期" },
+      "solar_term": { "name": "节气" },
+      "shichen": { "name": "十二时辰" },
+      "tst_time": { "name": "真太阳时" },
+      "bazi": { "name": "八字" },
+      "ganzhi": { "name": "天干地支" },
+      "twelve_gods": { "name": "十二天神" },
+      "chongsha": { "name": "冲煞" },
+      "xingxiu": { "name": "星宿" },
+      "season": { "name": "季节" },
+      "linggui": { "name": "灵龟八法" },
+      "najia": { "name": "纳甲法" },
+      "nazi": { "name": "纳子法" },
+      "xiaoliuren": { "name": "小六壬时卦" },      
+      "huangji_gua": { "name": "皇极经世月卦" },
+      "meihua_gua": { "name": "梅花易数时卦" },
+      "iching_reader": { "name": "易经卦象"}
+    },
+    "button": {
+      "reset_to_today": { "name": "回到今天" }
+    },
+    "select": {
+      "gender": {
+        "name": "子午流注性别选择",
+        "state": {
+          "男": "男",
+          "女": "女"
+        }
+      },
+      "iching_selector": {
+        "name": "易经查阅选择",
+        "state": {
+          "实时随动": "实时随动"
+        }
+      }
+    },
+    "date": {
+      "date_navigator": { "name": "基准日期切换" }
+    }
+  }
+}
