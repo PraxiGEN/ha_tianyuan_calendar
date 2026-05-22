@@ -47,7 +47,7 @@
 ### 手动安装
 
 1. 下载最新的: `https://github.com/hzonz/ha_tianyuan_calendar`
-2. 解压并将`custom_components/tianyuan_lunar`文件夹放入Home Assistant的`custom_components`目录
+2. 解压并将`custom_components/tianyuan_calendar`文件夹放入Home Assistant的`custom_components`目录
 3. 重启Home Assistant
 
 ## 📖 文档导航
