@@ -1,4 +1,4 @@
-# <img src="custom_components/ha_tianyuan_calendar/brand/icon.png" width="64"> 🌙天元历法 (TianYuan Calendar)
+# <img src="custom_components/tianyuan_calendar/brand/icon.png" width="64"> 🌙天元历法 (TianYuan Calendar)
 
 [![Release](https://img.shields.io/github/v/release/hzonz/ha_tianyuan_calendar)](https://github.com/hzonz/ha_tianyuan_calendar/releases)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/hzonz/ha_tianyuan_calendar/blob/main/LICENSE)
