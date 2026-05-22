@@ -73,11 +73,12 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         from homeassistant.helpers.entity import DeviceInfo
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry.entry_id)},
-            name="TianYuan Lunar",
-            manufacturer="TianYuan Lunar",
+            name="TianYuan 农历",
+            manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",
-            configuration_url="https://github.com/hzonz/tianyuan_lunar",
+            configuration_url="https://github.com/hzonz/ha_tianyuan_calendar",
+            model="察日月之度，定岁时之序。",
         )
         
     @property
@@ -86,11 +87,12 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         from homeassistant.helpers.entity import DeviceInfo
         return DeviceInfo(
             identifiers={(DOMAIN, f"{self.entry.entry_id}_shushu")}, # 独立的设备 ID
-            name="TianYuan ShuShu",
-            manufacturer="TianYuan ShuShu",
+            name="TianYuan 术数",
+            manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",
             via_device=(DOMAIN, self.entry.entry_id),
+            model="观天之道，执天之行，尽矣。",
         )        
 
     def _calculate_tst(self, dt: datetime, lon: float) -> datetime:

@@ -1,0 +1,14 @@
+
+{
+  "domain": "tianyuan_calendar",
+  "name": "天元历法",
+  "codeowners": ["@hzonz"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/hzonz/ha_tianyuan_calendar",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/hzonz/ha_tianyuan_calendar/issues",
+  "requirements": ["lunar-python==1.4.8"],
+  "version": "1.0.2"
+}

@@ -40,7 +40,7 @@ class TianYuanConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_ENABLE_MORE: False,  # 默认关闭
                 CONF_CALC_MODE: MODE_ST,  # 默认兼容模式
             }
-            return self.async_create_entry(title="天元农历", data={}, options=options)
+            return self.async_create_entry(title="TianYuan 天元", data={}, options=options)
 
         lon = float(self.hass.config.longitude or 120.0)
         return self.async_show_form(

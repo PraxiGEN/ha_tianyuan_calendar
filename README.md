@@ -1,10 +1,10 @@
-# <img src="custom_components/tianyuan_lunar/brand/icon.png" width="64"> 🌙天元农历 (TianYuan Lunar)
+# <img src="custom_components/tianyuan_calendar/brand/icon.png" width="64"> 🌙天元历法 (TianYuan Calendar)
 
-[![Release](https://img.shields.io/github/v/release/hzonz/tianyuan_lunar)](https://github.com/hzonz/tianyuan_lunar/releases)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/hzonz/tianyuan_lunar/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/v/release/hzonz/ha_tianyuan_calendar)](https://github.com/hzonz/ha_tianyuan_calendar/releases)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/hzonz/ha_tianyuan_calendar/blob/main/LICENSE)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
-## 天元农历不再仅仅是历法传感器，它是一个深度整合中国传统“天文、术数、医学”的智能引擎。通过真太阳时修正，为用户提供精确的排盘、取穴与卦象预测。
+## 天元历法不再仅仅是历法传感器，它是一个深度整合中国传统“天文、术数、医学”的智能引擎。通过真太阳时修正，为用户提供精确的排盘、取穴与卦象预测。
 
 ## ✨ 核心特性
 
@@ -38,16 +38,16 @@
 
 1. 在HACS的"集成"部分，点击右上角的三点菜单
 2. 选择"自定义存储库"
-3. 在存储库字段输入：`https://github.com/hzonz/tianyuan_lunar`
+3. 在存储库字段输入：`https://github.com/hzonz/ha_tianyuan_calendar`
 4. 类别选择"集成"
 5. 点击"添加"保存
-6. 在HACS中找到"tianyuan"集成并点击安装
+6. 在HACS中找到"天元历法"集成并点击安装
 7. 重启Home Assistant
 
 ### 手动安装
 
-1. 下载最新的: `https://github.com/hzonz/tianyuan_lunar`
-2. 解压并将`custom_components/tianyuan_lunar`文件夹放入Home Assistant的`custom_components`目录
+1. 下载最新的: `https://github.com/hzonz/ha_tianyuan_calendar`
+2. 解压并将`custom_components/tianyuan_calendar`文件夹放入Home Assistant的`custom_components`目录
 3. 重启Home Assistant
 
 ## 📖 文档导航
