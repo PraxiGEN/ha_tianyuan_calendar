@@ -36,11 +36,6 @@
       }
     }
   },
-  "device": {
-    "tianyuan_device": {
-      "name": "TianYuan Lunar"
-    }
-  },
   "entity": {
     "sensor": {
       "main_lunar": {"name": "Calendar"},
