@@ -35,12 +35,7 @@
         "pro": "专业模式 (所有数据基于真太阳时)"
       }
     }
-  },
-  "device": {
-    "tianyuan_device": {
-      "name": "天元农历"
-    }
-  },  
+  }, 
   "entity": {
     "sensor": {
       "main_lunar": { "name": "农历" },
