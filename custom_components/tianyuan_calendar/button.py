@@ -16,13 +16,11 @@ from .const import DOMAIN
 TIANYUAN_BUTTONS: tuple[ButtonEntityDescription, ...] = (
     ButtonEntityDescription(
         key="reset_to_today",
-        name="Reset To Today",              # 英文实体名（用于 entity_id）
-        translation_key="reset_to_today",   # 翻译键（用于 UI 显示）
+        translation_key="reset_to_today",
         icon="mdi:calendar-today",
         entity_category=EntityCategory.CONFIG,
     ),
 )
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -56,6 +54,7 @@ class TianYuanTodayButton(TianYuanBaseEntity, ButtonEntity):
 
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+        self._attr_translation_key = description.translation_key
 
     async def async_press(self) -> None:
         """按下按钮."""

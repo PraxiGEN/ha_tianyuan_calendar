@@ -1,0 +1,86 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "TianYuan Lunar Calendar",
+        "description": "Please enter the basic configuration to begin.",
+        "data": {
+          "custom_longitude": "Geographic Longitude",
+          "refresh_interval": "Refresh Interval (minutes)"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Only one instance of TianYuan Lunar Calendar can be configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "TianYuan Lunar Calendar Advanced Settings",
+        "data": {
+          "custom_longitude": "Geographic Longitude (for True Solar Time calibration)",
+          "refresh_interval": "Refresh Interval (minutes)",
+          "calc_mode": "Calculation Mode",
+          "enable_shushu": "Enable TianYuan Divination",
+          "enable_more": "Enable Additional Advanced Entities"
+        }
+      }
+    }
+  },
+  "selector": {
+    "calc_mode": {
+      "options": {
+        "standard": "Compatibility Mode (general info follows system time)",
+        "pro": "Professional Mode (all data based on True Solar Time)"
+      }
+    }
+  },
+  "device": {
+    "tianyuan_lunar": { "name": "TianYuan Lunar" },
+    "tianyuan_shushu": { "name": "TianYuan Divination" }
+  },  
+  "entity": {
+    "sensor": {
+      "main_lunar": { "name": "Lunar Calendar" },
+      "holiday": { "name": "Holiday" },
+      "solar_term": { "name": "Solar Term" },
+      "shichen": { "name": "Twelve Time Periods" },
+      "tst_time": { "name": "True Solar Time" },
+      "bazi": { "name": "BaZi" },
+      "ganzhi": { "name": "Heavenly Stems & Earthly Branches" },
+      "twelve_gods": { "name": "Twelve Gods" },
+      "chongsha": { "name": "ChongSha" },
+      "xingxiu": { "name": "Lunar Mansions" },
+      "season": { "name": "Season" },
+      "linggui": { "name": "LingGui Eight Methods" },
+      "najia": { "name": "NaJia Method" },
+      "nazi": { "name": "NaZi Method" },
+      "xiaoliuren": { "name": "Xiao Liu Ren Divination" },
+      "huangji_gua": { "name": "HuangJi JingShi Monthly Hexagram" },
+      "meihua_gua": { "name": "Meihua Yishu Hexagram" },
+      "iching_reader": { "name": "I Ching Hexagram" }
+    },
+    "button": {
+      "reset_to_today": { "name": "Return to Today" }
+    },
+    "select": {
+      "gender": {
+        "name": "ZiWu Flow Gender Selection",
+        "state": {
+          "男": "Male",
+          "女": "Female"
+        }
+      },
+      "iching_selector": {
+        "name": "I Ching Reading Selector",
+        "state": {
+          "实时随动": "Real-time Follow"
+        }
+      }
+    },
+    "date": {
+      "date_navigator": { "name": "Base Date Switch" }
+    }
+  }
+}

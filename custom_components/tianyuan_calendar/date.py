@@ -18,8 +18,7 @@ from .const import DOMAIN
 TIANYUAN_DATE_ENTITIES: tuple[DateEntityDescription, ...] = (
     DateEntityDescription(
         key="date_navigator",
-        name="Date Navigator",              # 英文实体名（用于 entity_id）
-        translation_key="date_navigator",   # 翻译键（用于 UI 显示）
+        translation_key="date_navigator",
         icon="mdi:calendar-search",
         entity_category=EntityCategory.CONFIG,
     ),
@@ -58,6 +57,7 @@ class TianYuanDateNavigator(TianYuanBaseEntity, DateEntity):
 
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+        self._attr_translation_key = description.translation_key
 
     @property
     def native_value(self) -> date:

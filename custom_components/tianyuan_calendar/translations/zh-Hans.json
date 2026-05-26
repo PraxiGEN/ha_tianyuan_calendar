@@ -36,6 +36,10 @@
       }
     }
   }, 
+  "device": {
+    "tianyuan_lunar": { "name": "TianYuan 农历" },
+    "tianyuan_shushu": { "name": "TianYuan 术数" }
+  },  
   "entity": {
     "sensor": {
       "main_lunar": { "name": "农历" },
