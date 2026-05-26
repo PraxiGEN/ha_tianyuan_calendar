@@ -98,16 +98,19 @@ MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
 SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key=TCM_LINGGUI,
+        translation_key=TCM_LINGGUI,
         icon="mdi:turtle",
         data_key=TCM_LINGGUI,
     ),
     TianYuanSensorEntityDescription(
         key=TCM_NAJIA,
+        translation_key=TCM_NAJIA,
         icon="mdi:needle",
         data_key=TCM_NAJIA,
     ),
     TianYuanSensorEntityDescription(
         key=TCM_NAZI,
+        translation_key=TCM_NAZI,
         icon="mdi:clock-time-four",
         data_key=TCM_NAZI,
     ),
@@ -119,11 +122,13 @@ SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_HUANGJI_GUA,
+        translation_key=SHUSHU_HUANGJI_GUA,
         icon="mdi:script-text-outline",
         data_key="shushu_data", 
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_MEIHUA_GUA,
+        translation_key=SHUSHU_MEIHUA_GUA,
         icon="mdi:yin-yang",
         data_key="shushu_data",
     ),
