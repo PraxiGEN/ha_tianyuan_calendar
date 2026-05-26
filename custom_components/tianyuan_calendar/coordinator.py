@@ -73,7 +73,8 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         from homeassistant.helpers.entity import DeviceInfo
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry.entry_id)},
-            name="TianYuan 农历",
+            name="TianYuan Lunar",
+            translation_key="tianyuan_lunar",
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",
@@ -87,7 +88,8 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         from homeassistant.helpers.entity import DeviceInfo
         return DeviceInfo(
             identifiers={(DOMAIN, f"{self.entry.entry_id}_shushu")}, # 独立的设备 ID
-            name="TianYuan 术数",
+            name="TianYuan ShuShu",
+            translation_key="tianyuan_shushu",
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",

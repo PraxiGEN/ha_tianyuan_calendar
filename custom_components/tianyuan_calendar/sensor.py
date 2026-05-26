@@ -31,27 +31,23 @@ class TianYuanSensorEntityDescription(SensorEntityDescription):
 DEFAULT_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key="main_lunar",
-        name="Main Lunar",
         translation_key="main_lunar",
         icon="mdi:calendar",
     ),
     TianYuanSensorEntityDescription(
         key="holiday",
-        name="Holiday",
         translation_key="holiday",
         icon="mdi:calendar-star",
         data_key="holiday_data",
     ),
     TianYuanSensorEntityDescription(
         key="solar_term",
-        name="Solar Term",
         translation_key="solar_term",
         icon="mdi:leaf",
         data_key="term_data",
     ),
     TianYuanSensorEntityDescription(
         key="shichen",
-        name="Shichen",
         translation_key="shichen",
         icon="mdi:clock-outline",
         data_key="shichen_data",
@@ -62,37 +58,31 @@ DEFAULT_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
 MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key="tst_time",
-        name="TST Time",
         translation_key="tst_time",
         icon="mdi:sun-clock",
     ),
     TianYuanSensorEntityDescription(
         key="bazi",
-        name="BaZi",
         translation_key="bazi",
         icon="mdi:dna",
     ),
     TianYuanSensorEntityDescription(
         key="ganzhi",
-        name="GanZhi",
         translation_key="ganzhi",
         icon="mdi:format-list-bulleted-type",
     ),
     TianYuanSensorEntityDescription(
         key="twelve_gods",
-        name="Twelve Gods",
         translation_key="twelve_gods",
         icon="mdi:shield-star",
     ),
     TianYuanSensorEntityDescription(
         key="chongsha",
-        name="ChongSha",
         translation_key="chongsha",
         icon="mdi:sword-cross",
     ),
     TianYuanSensorEntityDescription(
         key="xingxiu",
-        name="XingXiu",
         translation_key="xingxiu",
         icon="mdi:star-shooting",
     ),
@@ -108,44 +98,37 @@ MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
 SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key=TCM_LINGGUI,
-        name="LingGui",
         icon="mdi:turtle",
         data_key=TCM_LINGGUI,
     ),
     TianYuanSensorEntityDescription(
         key=TCM_NAJIA,
-        name="NaJia",
         icon="mdi:needle",
         data_key=TCM_NAJIA,
     ),
     TianYuanSensorEntityDescription(
         key=TCM_NAZI,
-        name="NaZi",
         icon="mdi:clock-time-four",
         data_key=TCM_NAZI,
     ),
     TianYuanSensorEntityDescription(
         key="xiaoliuren",
-        name="XiaoLiuRen",
         translation_key="xiaoliuren",
         icon="mdi:hand-back-right",
         data_key="xlr_info",
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_HUANGJI_GUA,
-        name="Monthly Hexagram",
         icon="mdi:script-text-outline",
         data_key="shushu_data", 
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_MEIHUA_GUA,
-        name="Hourly Hexagram",
         icon="mdi:yin-yang",
         data_key="shushu_data",
     ),
     TianYuanSensorEntityDescription(
         key="iching_reader",
-        name="I Ching",
         translation_key="iching_reader",
         icon="mdi:book-open-variant",
         data_key="iching_info",
@@ -187,7 +170,7 @@ class TianYuanSensorBase(TianYuanBaseEntity, SensorEntity):
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
         self._attr_has_entity_name = True
-        self._attr_translation_key = description.key
+        self._attr_translation_key = description.translation_key
 
 class TianYuanGenericSensor(TianYuanSensorBase):
     """处理默认核心实体."""

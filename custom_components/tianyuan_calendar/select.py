@@ -26,7 +26,6 @@ class TianYuanSelectDescription(SelectEntityDescription):
 TIANYUAN_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
     TianYuanSelectDescription(
         key="gender",
-        name="Gender",
         translation_key="gender",
         icon="mdi:gender-male-female",
         entity_category=EntityCategory.CONFIG,
@@ -34,7 +33,6 @@ TIANYUAN_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
     ),
     TianYuanSelectDescription(
         key="iching_selector",
-        name="I Ching",
         translation_key="iching_selector",
         icon="mdi:book-open-page-variant",
         entity_category=EntityCategory.CONFIG,
@@ -74,7 +72,7 @@ class TianYuanShushuSelect(TianYuanShushuBaseEntity, SelectEntity):
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
-        self._attr_translation_key = description.key
+        self._attr_translation_key = description.translation_key
 
         # 初始化选项
         if description.data_type == "gender":
