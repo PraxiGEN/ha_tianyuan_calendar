@@ -14,11 +14,16 @@ from .const import (
     DOMAIN,
     CONF_ENABLE_SHUSHU, 
     CONF_ENABLE_MORE, 
-    TCM_LINGGUI, 
-    TCM_NAJIA, 
-    TCM_NAZI,
-    SHUSHU_MEIHUA_GUA,
-    SHUSHU_HUANGJI_GUA
+    # 基础
+    KEY_MAIN_LUNAR, KEY_HOLIDAY, KEY_SOLAR_TERM, KEY_SHICHEN,
+    DATA_KEY_HOLIDAY, DATA_KEY_TERM, DATA_KEY_SHICHEN,
+    # 更多
+    KEY_TST_TIME, KEY_SIZHUBAZI, KEY_TIANGANDIZHI, KEY_TWELVE_GODS, 
+    KEY_CHONGSHA, KEY_DONGFANGXINGXIU, DATA_KEY_MORE,
+    # 术数
+    SHUSHU_LINGGUIBAFA, SHUSHU_NAJIAFA, SHUSHU_NAZIFA, KEY_XIAOLIUREN,
+    SHUSHU_HUANGJI_GUA, SHUSHU_MEIHUA_GUA, KEY_ICHING_READER,
+    DATA_KEY_SHUSHU, DATA_KEY_XLR, DATA_KEY_ICHING_INFO, DATA_KEY_ICHING_NAME
 )
 from .entity import TianYuanBaseEntity, TianYuanShushuBaseEntity
 
@@ -30,60 +35,70 @@ class TianYuanSensorEntityDescription(SensorEntityDescription):
 # 默认实体描述符
 DEFAULT_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
-        key="main_lunar",
-        translation_key="main_lunar",
+        key=KEY_MAIN_LUNAR,
+        name="Lunar Date",
+        translation_key=KEY_MAIN_LUNAR,
         icon="mdi:calendar",
     ),
     TianYuanSensorEntityDescription(
-        key="holiday",
-        translation_key="holiday",
+        key=KEY_HOLIDAY,
+        name="Holiday",
+        translation_key=KEY_HOLIDAY,
         icon="mdi:calendar-star",
-        data_key="holiday_data",
+        data_key=DATA_KEY_HOLIDAY,
     ),
     TianYuanSensorEntityDescription(
-        key="solar_term",
-        translation_key="solar_term",
+        key=KEY_SOLAR_TERM,
+        name="Solar Term",
+        translation_key=KEY_SOLAR_TERM,
         icon="mdi:leaf",
-        data_key="term_data",
+        data_key=DATA_KEY_TERM,
     ),
     TianYuanSensorEntityDescription(
-        key="shichen",
-        translation_key="shichen",
+        key=KEY_SHICHEN,
+        name="Shichen",
+        translation_key=KEY_SHICHEN,
         icon="mdi:clock-outline",
-        data_key="shichen_data",
+        data_key=DATA_KEY_SHICHEN,
     ),
 )
 
 # 更多扩展实体描述符
 MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
-        key="tst_time",
-        translation_key="tst_time",
+        key=KEY_TST_TIME,
+        name="TST Time",
+        translation_key=KEY_TST_TIME,
         icon="mdi:sun-clock",
     ),
     TianYuanSensorEntityDescription(
-        key="bazi",
-        translation_key="bazi",
+        key=KEY_SIZHUBAZI,
+        name="Si Zhu Ba Zi",
+        translation_key=KEY_SIZHUBAZI,
         icon="mdi:dna",
     ),
     TianYuanSensorEntityDescription(
-        key="ganzhi",
-        translation_key="ganzhi",
+        key=KEY_TIANGANDIZHI,
+        name="Tian Gan Di Zhi",
+        translation_key=KEY_TIANGANDIZHI,
         icon="mdi:format-list-bulleted-type",
     ),
     TianYuanSensorEntityDescription(
-        key="twelve_gods",
-        translation_key="twelve_gods",
+        key=KEY_TWELVE_GODS,
+        name="Twelve Gods",
+        translation_key=KEY_TWELVE_GODS,
         icon="mdi:shield-star",
     ),
     TianYuanSensorEntityDescription(
-        key="chongsha",
-        translation_key="chongsha",
+        key=KEY_CHONGSHA,
+        name="Chong Sha",
+        translation_key=KEY_CHONGSHA,
         icon="mdi:sword-cross",
     ),
     TianYuanSensorEntityDescription(
-        key="xingxiu",
-        translation_key="xingxiu",
+        key=KEY_DONGFANGXINGXIU,
+        name="Dong Fang Xing Xiu",
+        translation_key=KEY_DONGFANGXINGXIU,
         icon="mdi:star-shooting",
     ),
     # TianYuanSensorEntityDescription(
@@ -97,46 +112,53 @@ MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
 # 天元术数
 SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
-        key=TCM_LINGGUI,
-        translation_key=TCM_LINGGUI,
+        key=SHUSHU_LINGGUIBAFA,
+        name="Ling Gui Ba Fa",
+        translation_key=SHUSHU_LINGGUIBAFA,
         icon="mdi:turtle",
-        data_key=TCM_LINGGUI,
+        data_key=SHUSHU_LINGGUIBAFA,
     ),
     TianYuanSensorEntityDescription(
-        key=TCM_NAJIA,
-        translation_key=TCM_NAJIA,
+        key=SHUSHU_NAJIAFA,
+        name="Na Jia Fa",
+        translation_key=SHUSHU_NAJIAFA,
         icon="mdi:needle",
-        data_key=TCM_NAJIA,
+        data_key=SHUSHU_NAJIAFA,
     ),
     TianYuanSensorEntityDescription(
-        key=TCM_NAZI,
-        translation_key=TCM_NAZI,
+        key=SHUSHU_NAZIFA,
+        name="Na Zi Fa",
+        translation_key=SHUSHU_NAZIFA,
         icon="mdi:clock-time-four",
-        data_key=TCM_NAZI,
+        data_key=SHUSHU_NAZIFA,
     ),
     TianYuanSensorEntityDescription(
-        key="xiaoliuren",
-        translation_key="xiaoliuren",
+        key=KEY_XIAOLIUREN,
+        name="Xiao Liuren",
+        translation_key=KEY_XIAOLIUREN,
         icon="mdi:hand-back-right",
-        data_key="xlr_info",
+        data_key=DATA_KEY_XLR,
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_HUANGJI_GUA,
+        name="Huang Ji Gua",
         translation_key=SHUSHU_HUANGJI_GUA,
         icon="mdi:script-text-outline",
-        data_key="shushu_data", 
+        data_key=DATA_KEY_SHUSHU,
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_MEIHUA_GUA,
+        name="Mei Hua Gua",
         translation_key=SHUSHU_MEIHUA_GUA,
         icon="mdi:yin-yang",
-        data_key="shushu_data",
+        data_key=DATA_KEY_SHUSHU,
     ),
     TianYuanSensorEntityDescription(
-        key="iching_reader",
-        translation_key="iching_reader",
+        key=KEY_ICHING_READER,
+        name="I Ching Reader",
+        translation_key=KEY_ICHING_READER,
         icon="mdi:book-open-variant",
-        data_key="iching_info",
+        data_key=DATA_KEY_ICHING_INFO,
     ),
 )
 
@@ -181,7 +203,7 @@ class TianYuanGenericSensor(TianYuanSensorBase):
     """处理默认核心实体."""
     @property
     def native_value(self) -> StateType:
-        if self.entity_description.key == "main_lunar":
+        if self.entity_description.key == KEY_MAIN_LUNAR:
             l = self.coordinator.data["lunar"]
             return f"{l.getMonthInChinese()}月{l.getDayInChinese()}"
         res = self.coordinator.data.get(self.entity_description.data_key)
@@ -189,10 +211,10 @@ class TianYuanGenericSensor(TianYuanSensorBase):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        if self.entity_description.key == "main_lunar":
+        if self.entity_description.key == KEY_MAIN_LUNAR:
             return self.coordinator.data.get("full_attributes", {})
-        if self.entity_description.key == "shichen":
-            return self.coordinator.data.get("shichen_data", {}).get("data", {})
+        if self.entity_description.key == KEY_SHICHEN:
+            return self.coordinator.data.get(DATA_KEY_SHICHEN, {}).get("data", {})
         return self.coordinator.data.get(self.entity_description.data_key, {})
 
 
@@ -200,13 +222,13 @@ class TianYuanAdvancedSensor(TianYuanSensorBase):
     """高级扩展传感器."""
     @property
     def native_value(self) -> StateType:
-        more_data = self.coordinator.data.get("more_entities_data", {})
+        more_data = self.coordinator.data.get(DATA_KEY_MORE, {})
         sensor_info = more_data.get(self.entity_description.key)
         return sensor_info.get("state") if sensor_info else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        more_data = self.coordinator.data.get("more_entities_data", {})
+        more_data = self.coordinator.data.get(DATA_KEY_MORE, {})
         sensor_info = more_data.get(self.entity_description.key)
         return sensor_info.get("attributes", {}) if sensor_info else {}
 
@@ -222,9 +244,9 @@ class TianYuanShushuSensor(TianYuanShushuBaseEntity, TianYuanSensorBase):
     def native_value(self) -> StateType:
         """获取状态值."""
         # 优先处理“易经详注阅读器” (因为它直接读取协调器当前确定的卦名)
-        if self.entity_description.key == "iching_reader":
+        if self.entity_description.key == KEY_ICHING_READER:
             # 返回协调器中计算好的当前展示卦名（实时或手动选择）
-            return self.coordinator.data.get("iching_display_name")
+            return self.coordinator.data.get(DATA_KEY_ICHING_NAME)
 
         # 处理其他需要从 data_key 获取的数据
         raw_data = self.coordinator.data.get(self.entity_description.data_key)
@@ -232,12 +254,12 @@ class TianYuanShushuSensor(TianYuanShushuBaseEntity, TianYuanSensorBase):
             return None
 
         # 子午流注类 (najia, nazi, linggui)
-        if self.entity_description.key in [TCM_NAJIA, TCM_NAZI, TCM_LINGGUI]:
+        if self.entity_description.key in [SHUSHU_NAJIAFA, SHUSHU_NAZIFA, SHUSHU_LINGGUIBAFA]:
             return raw_data.get("summary")
 
         # 小六壬类
-        if self.entity_description.key == "xiaoliuren":
-            res = self.coordinator.data.get("xlr_info")
+        if self.entity_description.key == KEY_XIAOLIUREN:
+            res = self.coordinator.data.get(DATA_KEY_XLR)
             return res.get("state") if res else None
 
         # 卦象类 (huangji_gua, meihua_gua)
@@ -249,9 +271,9 @@ class TianYuanShushuSensor(TianYuanShushuBaseEntity, TianYuanSensorBase):
     def extra_state_attributes(self) -> dict[str, Any]:
         """获取扩展属性."""
         # 优先处理“易经详注阅读器”
-        if self.entity_description.key == "iching_reader":
+        if self.entity_description.key == KEY_ICHING_READER:
             # 返回加密库中提取的该卦全量字典信息
-            return self.coordinator.data.get("iching_info", {})
+            return self.coordinator.data.get(DATA_KEY_ICHING_INFO, {})
 
         # 处理其他数据
         raw_data = self.coordinator.data.get(self.entity_description.data_key)
@@ -259,12 +281,12 @@ class TianYuanShushuSensor(TianYuanShushuBaseEntity, TianYuanSensorBase):
             return {}
 
         # 子午流注类
-        if self.entity_description.key in [TCM_NAJIA, TCM_NAZI, TCM_LINGGUI]:
+        if self.entity_description.key in [SHUSHU_NAJIAFA, SHUSHU_NAZIFA, SHUSHU_LINGGUIBAFA]:
             return raw_data
 
         # 小六壬类
-        if self.entity_description.key == "xiaoliuren":
-            res = self.coordinator.data.get("xlr_info")
+        if self.entity_description.key == KEY_XIAOLIUREN:
+            res = self.coordinator.data.get(DATA_KEY_XLR)
             return res.get("attributes", {}) if res else {}
 
         # 卦象类 (返回内部的 attributes 字典)

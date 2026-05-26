@@ -11,12 +11,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import TianYuanConfigEntry
 from .entity import TianYuanBaseEntity
-from .const import DOMAIN
+from .const import DOMAIN, KEY_RESET_TO_TODAY
 
 TIANYUAN_BUTTONS: tuple[ButtonEntityDescription, ...] = (
     ButtonEntityDescription(
-        key="reset_to_today",
-        translation_key="reset_to_today",
+        key=KEY_RESET_TO_TODAY,
+        name="Reset to Today",
+        translation_key=KEY_RESET_TO_TODAY,
         icon="mdi:calendar-today",
         entity_category=EntityCategory.CONFIG,
     ),

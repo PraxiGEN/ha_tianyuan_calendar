@@ -33,23 +33,61 @@ CONF_ENABLE_SHUSHU: Final = "enable_shushu"  # 统一开关：启用术数模式
 MODE_ST: Final = "standard"  # 标准模式：基于系统时间
 MODE_TST: Final = "pro"      # 专业模式：基于真太阳时 (True Solar Time)
 
-# 术数/中医内部数据标识符
-TCM_LINGGUI: Final = "linggui"
-TCM_NAJIA: Final = "najia"
-TCM_NAZI: Final = "nazi"
+# --- 基础历法 Key ---
+KEY_MAIN_LUNAR = "main_lunar"
+KEY_HOLIDAY = "holiday"
+KEY_SOLAR_TERM = "solar_term"
+KEY_SHICHEN = "shichen"
 
-# 易经卦象内部数据标识符
-SHUSHU_HUANGJI_GUA: Final = "huangji_gua"    # 皇极经世值年卦
-SHUSHU_MEIHUA_GUA: Final = "meihua_gua"    # 梅花易数时卦
+# --- 更多实体 Key ---
+KEY_TST_TIME = "tst_time"
+KEY_SIZHUBAZI = "sizhubazi"
+KEY_TIANGANDIZHI = "tiangandizhi"
+KEY_TWELVE_GODS = "twelve_gods"
+KEY_CHONGSHA = "chongsha"
+KEY_DONGFANGXINGXIU = "dongfangxingxiu"
 
-# 协调器内部数据字典键名
-KEY_SHUSHU_DATA: Final = "shushu_data" # 存放易经相关数据的 Key
+# --- 术数实体 Key ---
+SHUSHU_LINGGUIBAFA = "lingguibafa"
+SHUSHU_NAJIAFA = "najiafa"
+SHUSHU_NAZIFA = "nazifa"
+KEY_XIAOLIUREN = "xiaoliuren"
+SHUSHU_HUANGJI_GUA = "huangji_gua"
+SHUSHU_MEIHUA_GUA = "meihua_gua"
+KEY_ICHING_READER = "iching_reader"
+
+# --- 协调器数据 Key (Data Key) ---
+DATA_KEY_HOLIDAY = "holiday_data"
+DATA_KEY_TERM = "term_data"
+DATA_KEY_SHICHEN = "shichen_data"
+DATA_KEY_MORE = "more_entities_data"
+DATA_KEY_SHUSHU = "shushu_data"
+DATA_KEY_XLR = "xlr_info"
+DATA_KEY_ICHING_INFO = "iching_info"
+DATA_KEY_ICHING_NAME = "iching_display_name"
+
+# --- Date 实体 Key ---
+KEY_DATE_NAVIGATOR = "date_navigator"
+
+# --- Button 实体 Key ---
+KEY_RESET_TO_TODAY = "reset_to_today"
+
+# --- Select 实体 Key ---
+KEY_GENDER = "gender"
+KEY_ICHING_SELECTOR = "iching_selector"
+
+# --- 选择器内部类型 (data_type) ---
+SELECT_TYPE_GENDER = "gender"
+SELECT_TYPE_ICHING = "iching"
+
+# --- 特殊选项文本 ---
+OPTION_ICHING_SYNC = "实时随动"
 
 # 术数实体列表 (方便在 sensor.py 中循环注册实体)
 SHUSHU_METHODS: Final = [
-    TCM_LINGGUI,
-    TCM_NAJIA,
-    TCM_NAZI,
+    SHUSHU_LINGGUIBAFA,
+    SHUSHU_NAJIAFA,
+    SHUSHU_NAZIFA,
     SHUSHU_HUANGJI_GUA,
     SHUSHU_MEIHUA_GUA,
 ]

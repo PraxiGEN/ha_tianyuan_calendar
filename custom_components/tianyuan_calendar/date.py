@@ -12,13 +12,14 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import TianYuanConfigEntry
 from .entity import TianYuanBaseEntity
-from .const import DOMAIN
+from .const import DOMAIN, KEY_DATE_NAVIGATOR
 
 # 使用 DateEntityDescription
 TIANYUAN_DATE_ENTITIES: tuple[DateEntityDescription, ...] = (
     DateEntityDescription(
-        key="date_navigator",
-        translation_key="date_navigator",
+        key=KEY_DATE_NAVIGATOR,
+        name="Date Navigator",
+        translation_key=KEY_DATE_NAVIGATOR,
         icon="mdi:calendar-search",
         entity_category=EntityCategory.CONFIG,
     ),
