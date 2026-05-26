@@ -16,17 +16,47 @@ from homeassistant.util import dt as dt_util
 # 导入外部算法库和工具类
 from .tianyuanshushu import ZiwuLiuzhu, TianYuanShuShu, IchingLibrary
 from .const import (
-    DOMAIN, 
+    DOMAIN,
     LOGGER,
-    CONF_REFRESH_INTERVAL, 
+
+    # 配置项
+    CONF_REFRESH_INTERVAL,
     CONF_CUSTOM_LONGITUDE,
     CONF_ENABLE_SHUSHU,
     CONF_CALC_MODE,
     MODE_ST,
     MODE_TST,
-    KEY_SHUSHU_DATA,
+
+    # 基础数据键
+    KEY_MAIN_LUNAR,
+    KEY_HOLIDAY,
+    KEY_SOLAR_TERM,
+    KEY_SHICHEN,
+    DATA_KEY_HOLIDAY,
+    DATA_KEY_TERM,
+    DATA_KEY_SHICHEN,
+
+    # 更多数据
+    KEY_TST_TIME,
+    KEY_SIZHUBAZI,
+    KEY_TIANGANDIZHI,
+    KEY_TWELVE_GODS,
+    KEY_CHONGSHA,
+    KEY_DONGFANGXINGXIU,
+    DATA_KEY_MORE,
+
+    # 术数相关
+    SHUSHU_LINGGUIBAFA,
+    SHUSHU_NAJIAFA,
+    SHUSHU_NAZIFA,
     SHUSHU_MEIHUA_GUA,
-    SHUSHU_HUANGJI_GUA
+    SHUSHU_HUANGJI_GUA,
+    KEY_XIAOLIUREN,
+    KEY_ICHING_READER,
+    DATA_KEY_SHUSHU,
+    DATA_KEY_XLR,
+    DATA_KEY_ICHING_INFO,
+    DATA_KEY_ICHING_NAME,
 )
 
 # 导入农历库
@@ -44,9 +74,14 @@ class TianYuanData(TypedDict):
     term_data: dict[str, Any]
     shichen_data: dict[str, Any]
     full_attributes: dict[str, Any]
+    more_entities_data: dict[str, Any]
     linggui: dict[str, Any]
     najia: dict[str, Any]
     nazi: dict[str, Any]
+    shushu_data: dict[str, Any]
+    xlr_info: dict[str, Any]
+    iching_info: dict[str, Any]
+    iching_display_name: str
 
 class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     """天元核心计算协调器."""
@@ -57,7 +92,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         self.version = version
         self.view_date: date | None = None
         self.gender: str = "男"
-        self.selected_iching = None
+        self.selected_iching: str | None = None
         
         refresh_min = entry.options.get(CONF_REFRESH_INTERVAL, 1)
         
@@ -139,15 +174,15 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "tst_dt": tst_dt,
             "is_realtime": is_realtime,
             "gender": self.gender,
-            "holiday_data": self._get_holiday_logic(st_lunar, solar, calc_base),
-            "term_data": self._get_term_logic(st_lunar, solar),
-            "shichen_data": self._get_shichen_logic(st_lunar, calc_base),
+            DATA_KEY_HOLIDAY: self._get_holiday_logic(st_lunar, solar, calc_base),
+            DATA_KEY_TERM: self._get_term_logic(st_lunar, solar),
+            DATA_KEY_SHICHEN: self._get_shichen_logic(st_lunar, calc_base),
             "full_attributes": self._get_full_attributes(general_lunar, solar),
-            "more_entities_data": self._get_more_logic(tst_lunar, tst_dt),
+            DATA_KEY_MORE: self._get_more_logic(tst_lunar, tst_dt),
             # 术数占位符
-            "najia": {}, "linggui": {}, "nazi": {},
-            "xlr_info": {},  "iching_info": {}, "iching_display_name": "",
-            KEY_SHUSHU_DATA: {}
+            SHUSHU_NAJIAFA: {}, SHUSHU_LINGGUIBAFA: {}, SHUSHU_NAZIFA: {},
+            DATA_KEY_XLR: {},  DATA_KEY_ICHING_INFO: {}, DATA_KEY_ICHING_NAME: "",
+            DATA_KEY_SHUSHU: {}
         }
     
         # 只有开启开关才执行深度计算
@@ -172,17 +207,17 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     
         return {
 
-            "najia": ZiwuLiuzhu.calculate_najia(tst_lunar),
-            "linggui": ZiwuLiuzhu.calculate_linggui(tst_lunar, self.gender),
-            "nazi": ZiwuLiuzhu.calculate_nazi(tst_dt),
+            SHUSHU_NAJIAFA: ZiwuLiuzhu.calculate_najia(tst_lunar),
+            SHUSHU_LINGGUIBAFA: ZiwuLiuzhu.calculate_linggui(tst_lunar, self.gender),
+            SHUSHU_NAZIFA: ZiwuLiuzhu.calculate_nazi(tst_dt),
             
-            KEY_SHUSHU_DATA: {
+            DATA_KEY_SHUSHU: {
                 SHUSHU_MEIHUA_GUA: meihua_gua,
                 SHUSHU_HUANGJI_GUA: huangji_gua,
             },
-            "xlr_info": xlr_data,
-            "iching_display_name": target_gua, 
-            "iching_info": gua_detail
+            DATA_KEY_XLR: xlr_data,
+            DATA_KEY_ICHING_NAME: target_gua,
+            DATA_KEY_ICHING_INFO: gua_detail
         }
 
 
@@ -305,7 +340,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         
         return {
             # 真太阳时实体 (基于真太阳时的时辰属性)
-            "tst_time": {
+            KEY_TST_TIME: {
                 "state": f"{lunar.getTimeZhi()}时",
                 "attributes": {
                     "农历": f"{lunar.getMonthInChinese()}月{lunar.getDayInChinese()}",
@@ -319,7 +354,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             },
             
             # 八字实体
-            "bazi": {
+            KEY_SIZHUBAZI: {
                 "state": f"{gender_prefix} {ba_zi.toString()}",
                 "attributes": {
                     "五行": f"{ba_zi.getYearWuXing()}, {ba_zi.getMonthWuXing()}, {ba_zi.getDayWuXing()}, {ba_zi.getTimeWuXing()}",
@@ -335,7 +370,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             },
             
             # 天干地支实体
-            "ganzhi": {
+            KEY_TIANGANDIZHI: {
                 "state": f"{lunar.getYearInGanZhiExact()}{lunar.getYearShengXiaoExact()}年 {lunar.getMonthInGanZhiExact()}月 {lunar.getDayInGanZhiExact()}日",
                 "attributes": {
                     "干支": {
@@ -359,7 +394,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             },
             
             # 十二天神实体
-            "twelve_gods": {
+            KEY_TWELVE_GODS: {
                 "state": f"{lunar.getDayTianShen()}({lunar.getDayTianShenType()}) {lunar.getDayTianShenLuck()}",
                 "attributes": {
                     "择日法": "青龙明堂与天刑，朱雀金贵天德神； 白虎玉堂天牢黑，玄武司命惊勾陈。",
@@ -368,7 +403,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             },
             
             # 冲煞实体
-            "chongsha": {
+            KEY_CHONGSHA: {
                 "state": f"{lunar.getDayShengXiao()}日 冲{lunar.getDayChongDesc()} 煞{lunar.getDaySha()}",
                 "attributes": {
                     "当日生肖": lunar.getDayShengXiao(),
@@ -382,7 +417,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             },
             
             # 星宿实体
-            "xingxiu": {
+            KEY_DONGFANGXINGXIU: {
                 "state": f"{lunar.getGong()}方{lunar.getXiu()}{lunar.getZheng()}{lunar.getAnimal()}-{lunar.getXiuLuck()}",
                 "attributes": {
                     "歌诀": lunar.getXiuSong()
