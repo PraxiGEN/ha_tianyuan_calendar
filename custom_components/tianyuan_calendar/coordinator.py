@@ -9,6 +9,7 @@ from datetime import datetime, date, timedelta
 from typing import Any, TypedDict
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
@@ -70,7 +71,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     @property
     def device_info(self):
         """定义设备模型."""
-        from homeassistant.helpers.entity import DeviceInfo
+
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry.entry_id)},
             name="TianYuan Lunar",
@@ -85,7 +86,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     @property
     def shushu_device_info(self):
         """子设备：天元术数."""
-        from homeassistant.helpers.entity import DeviceInfo
+     
         return DeviceInfo(
             identifiers={(DOMAIN, f"{self.entry.entry_id}_shushu")}, # 独立的设备 ID
             name="TianYuan ShuShu",
