@@ -34,7 +34,7 @@ class TianYuanSelectDescription(SelectEntityDescription):
 TIANYUAN_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
     TianYuanSelectDescription(
         key=KEY_GENDER,
-        name="Gender",
+        name="ZiWu Flow Gender Selection",
         translation_key=KEY_GENDER,
         icon="mdi:gender-male-female",
         entity_category=EntityCategory.CONFIG,
@@ -42,7 +42,7 @@ TIANYUAN_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
     ),
     TianYuanSelectDescription(
         key=KEY_ICHING_SELECTOR,
-        name="I Ching Selector",
+        name="I Ching Reading Selector",
         translation_key=KEY_ICHING_SELECTOR,
         icon="mdi:book-open-page-variant",
         entity_category=EntityCategory.CONFIG,

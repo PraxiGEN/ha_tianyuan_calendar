@@ -18,7 +18,7 @@ from .const import DOMAIN, KEY_DATE_NAVIGATOR
 TIANYUAN_DATE_ENTITIES: tuple[DateEntityDescription, ...] = (
     DateEntityDescription(
         key=KEY_DATE_NAVIGATOR,
-        name="Date Navigator",
+        name="Base Date Switch",
         translation_key=KEY_DATE_NAVIGATOR,
         icon="mdi:calendar-search",
         entity_category=EntityCategory.CONFIG,

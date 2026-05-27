@@ -36,7 +36,7 @@ class TianYuanSensorEntityDescription(SensorEntityDescription):
 DEFAULT_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key=KEY_MAIN_LUNAR,
-        name="Lunar Date",
+        name="Lunar Calendar",
         translation_key=KEY_MAIN_LUNAR,
         icon="mdi:calendar",
     ),
@@ -56,7 +56,7 @@ DEFAULT_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     ),
     TianYuanSensorEntityDescription(
         key=KEY_SHICHEN,
-        name="Shichen",
+        name="Twelve Time Periods",
         translation_key=KEY_SHICHEN,
         icon="mdi:clock-outline",
         data_key=DATA_KEY_SHICHEN,
@@ -67,19 +67,19 @@ DEFAULT_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
 MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key=KEY_TST_TIME,
-        name="TST Time",
+        name="True Solar Time",
         translation_key=KEY_TST_TIME,
         icon="mdi:sun-clock",
     ),
     TianYuanSensorEntityDescription(
         key=KEY_SIZHUBAZI,
-        name="Si Zhu Ba Zi",
+        name="Four Pillars of Destiny",
         translation_key=KEY_SIZHUBAZI,
         icon="mdi:dna",
     ),
     TianYuanSensorEntityDescription(
         key=KEY_TIANGANDIZHI,
-        name="Tian Gan Di Zhi",
+        name="Heavenly Stems & Earthly Branches",
         translation_key=KEY_TIANGANDIZHI,
         icon="mdi:format-list-bulleted-type",
     ),
@@ -113,49 +113,49 @@ MORE_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
 SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key=SHUSHU_LINGGUIBAFA,
-        name="Ling Gui Ba Fa",
+        name="LingGui Eight Methods",
         translation_key=SHUSHU_LINGGUIBAFA,
         icon="mdi:turtle",
         data_key=SHUSHU_LINGGUIBAFA,
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_NAJIAFA,
-        name="Na Jia Fa",
+        name="NaJia Method",
         translation_key=SHUSHU_NAJIAFA,
         icon="mdi:needle",
         data_key=SHUSHU_NAJIAFA,
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_NAZIFA,
-        name="Na Zi Fa",
+        name="NaZi Method",
         translation_key=SHUSHU_NAZIFA,
         icon="mdi:clock-time-four",
         data_key=SHUSHU_NAZIFA,
     ),
     TianYuanSensorEntityDescription(
         key=KEY_XIAOLIUREN,
-        name="Xiao Liuren",
+        name="Xiao Liu Ren Divination",
         translation_key=KEY_XIAOLIUREN,
         icon="mdi:hand-back-right",
         data_key=DATA_KEY_XLR,
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_HUANGJI_GUA,
-        name="Huang Ji Gua",
+        name="HuangJi JingShi Monthly Hexagram",
         translation_key=SHUSHU_HUANGJI_GUA,
         icon="mdi:script-text-outline",
         data_key=DATA_KEY_SHUSHU,
     ),
     TianYuanSensorEntityDescription(
         key=SHUSHU_MEIHUA_GUA,
-        name="Mei Hua Gua",
+        name="Meihua Yishu Hexagram",
         translation_key=SHUSHU_MEIHUA_GUA,
         icon="mdi:yin-yang",
         data_key=DATA_KEY_SHUSHU,
     ),
     TianYuanSensorEntityDescription(
         key=KEY_ICHING_READER,
-        name="I Ching Reader",
+        name="I Ching Hexagram",
         translation_key=KEY_ICHING_READER,
         icon="mdi:book-open-variant",
         data_key=DATA_KEY_ICHING_INFO,
@@ -197,6 +197,7 @@ class TianYuanSensorBase(TianYuanBaseEntity, SensorEntity):
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
         self._attr_has_entity_name = True
+
         self._attr_translation_key = description.translation_key
 
 class TianYuanGenericSensor(TianYuanSensorBase):
