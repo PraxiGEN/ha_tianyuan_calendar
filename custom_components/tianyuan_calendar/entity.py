@@ -26,10 +26,15 @@ class TianYuanBaseEntity(CoordinatorEntity[TianYuanCoordinator]):
         """判断实体是否可用."""
         return super().available and self.coordinator.data is not None
 
-
-class TianYuanShushuBaseEntity(TianYuanBaseEntity):
-    """术数设备实体基类."""
+class TianYuanQihuangBaseEntity(TianYuanBaseEntity):
+    """子设备基类：天元岐黄 (中医)"""
     @property
     def device_info(self):
-        # 始终指向术数设备
+        return self.coordinator.qihuang_device_info
+
+class TianYuanShushuBaseEntity(TianYuanBaseEntity):
+    """子设备基类：天元术数 (易理)"""
+    @property
+    def device_info(self):
         return self.coordinator.shushu_device_info
+    
