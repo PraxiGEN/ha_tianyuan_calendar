@@ -8,6 +8,8 @@
 
 ## ✨ 核心特性
 
+### 系统使用本地数据库作为数据源，所有逻辑均在本地离线计算完成。
+
 ### 📅 基础历法 (Foundation)
 - **精准农历**：支持完整的农历日期、闰月提醒、月相信息。🌙
 - **二十四节气**：提供节气倒计时、精确交节时刻及物候描述。🍂
@@ -41,7 +43,7 @@
 2. 选择"自定义存储库"
 3. 在存储库字段输入：
 ```yaml
-`https://github.com/hzonz/ha_tianyuan_calendar`
+https://github.com/hzonz/ha_tianyuan_calendar
 ```
 4. 类别选择"集成"
 5. 点击"添加"保存
@@ -52,7 +54,7 @@
 
 1. 下载最新的:
 ```yaml
-`https://github.com/hzonz/ha_tianyuan_calendar`
+https://github.com/hzonz/ha_tianyuan_calendar
 ```
 2. 解压并将`custom_components/tianyuan_calendar`文件夹放入Home Assistant的`custom_components`目录
 3. 重启Home Assistant
