@@ -11,13 +11,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import TianYuanConfigEntry
 from .entity import TianYuanBaseEntity
-from .const import DOMAIN, KEY_RESET_TO_TODAY
+from .const import DOMAIN
 
 TIANYUAN_BUTTONS: tuple[ButtonEntityDescription, ...] = (
     ButtonEntityDescription(
-        key=KEY_RESET_TO_TODAY,
+        key="reset_to_today",
         name="Reset to Today",
-        translation_key=KEY_RESET_TO_TODAY,
+        translation_key="reset_to_today",
         icon="mdi:calendar-today",
         entity_category=EntityCategory.CONFIG,
     ),
@@ -30,14 +30,12 @@ async def async_setup_entry(
 ) -> None:
     """基于 runtime_data 设置按钮实体."""
     coordinator = entry.runtime_data
-
     entities = [
         TianYuanTodayButton(coordinator, entry, description)
         for description in TIANYUAN_BUTTONS
     ]
 
     async_add_entities(entities)
-
 
 class TianYuanTodayButton(TianYuanBaseEntity, ButtonEntity):
     """重置日期到当前的按钮."""
@@ -59,5 +57,5 @@ class TianYuanTodayButton(TianYuanBaseEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         """按下按钮."""
-        self.coordinator.view_date = None
+        self.coordinator.查看日期 = None
         await self.coordinator.async_refresh()

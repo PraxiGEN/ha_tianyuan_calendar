@@ -12,19 +12,17 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import TianYuanConfigEntry
 from .entity import TianYuanBaseEntity
-from .const import DOMAIN, KEY_DATE_NAVIGATOR
 
-# 使用 DateEntityDescription
+
 TIANYUAN_DATE_ENTITIES: tuple[DateEntityDescription, ...] = (
     DateEntityDescription(
-        key=KEY_DATE_NAVIGATOR,
+        key="date_navigator",
         name="Base Date Switch",
-        translation_key=KEY_DATE_NAVIGATOR,
+        translation_key="date_navigator",
         icon="mdi:calendar-search",
         entity_category=EntityCategory.CONFIG,
     ),
 )
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -63,9 +61,9 @@ class TianYuanDateNavigator(TianYuanBaseEntity, DateEntity):
     @property
     def native_value(self) -> date:
         """返回当前显示的日期."""
-        return self.coordinator.view_date or date.today()
+        return self.coordinator.查看日期 or date.today()
 
     async def async_set_value(self, value: date) -> None:
         """用户在 UI 日历控件选择了新日期."""
-        self.coordinator.view_date = value
+        self.coordinator.查看日期 = value
         await self.coordinator.async_refresh()

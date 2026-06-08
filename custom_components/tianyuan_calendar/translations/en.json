@@ -1,4 +1,5 @@
 {
+  "title": "TianYuan Calendar",
   "config": {
     "step": {
       "user": {
@@ -22,8 +23,10 @@
           "custom_longitude": "Geographic Longitude (for True Solar Time calibration)",
           "refresh_interval": "Refresh Interval (minutes)",
           "calc_mode": "Calculation Mode",
+          "enable_qihuang": "Enable TianYuan Qihuang",
           "enable_shushu": "Enable TianYuan Divination",
-          "enable_more": "Enable Additional Advanced Entities"
+          "enable_more": "Enable Additional Advanced Entities",
+          "system_token": "System Token"
         }
       }
     }
@@ -38,28 +41,38 @@
   },
   "device": {
     "tianyuan_lunar": { "name": "TianYuan Lunar" },
+    "tianyuan_qihuang": { "name": "TianYuan Qihuang" },
     "tianyuan_shushu": { "name": "TianYuan Divination" }
   },  
   "entity": {
     "sensor": {
-      "main_lunar": { "name": "Lunar Calendar" },
-      "holiday": { "name": "Holiday" },
-      "solar_term": { "name": "Solar Term" },
-      "shichen": { "name": "Twelve Time Periods" },
-      "tst_time": { "name": "True Solar Time" },
-      "sizhubazi": { "name": "Four Pillars of Destiny" },
-      "tiangandizhi": { "name": "Heavenly Stems & Earthly Branches" },
-      "twelve_gods": { "name": "Twelve Gods" },
-      "chongsha": { "name": "Chong Sha" },
-      "dongfangxingxiu": { "name": "Dong Fang Xing Xiu" },
-      "season": { "name": "Season" },
-      "lingguibafa": { "name": "LingGui Eight Methods" },
-      "najiafa": { "name": "NaJia Method" },
-      "nazifa": { "name": "NaZi Method" },
-      "xiaoliuren": { "name": "Xiao Liu Ren Divination" },
-      "huangji_gua": { "name": "HuangJi JingShi Monthly Hexagram" },
-      "meihua_gua": { "name": "Meihua Yishu Hexagram" },
-      "iching_reader": { "name": "I Ching Hexagram" }
+      "main_lunar":{"name":"Lunar Calendar"},
+      "holiday":{"name":"Holiday"},
+      "solar_term":{"name":"Solar Term"},
+      "shier_shichen":{"name":"Shi Er Shi Chen"},
+      "tst_time":{"name":"True Solar Time"},
+      "sizhu_bazi":{"name":"Four Pillars of Destiny"},
+      "tiangan_dizhi":{"name":"Heavenly Stems & Earthly Branches"},
+      "shier_tianshen":{"name":"Shi Er Tian Shen"},
+      "chong_sha":{"name":"Chong Sha"},
+      "dongfang_xingxiu":{"name":"Dong Fang Xing Xiu"},
+      "season":{"name":"Season"},
+      "linggu_bafa":{"name":"Ling Gui Ba Fa"},
+      "najia_shifa":{"name":"Na Jia Shi Fa"},
+      "nazi_shifa":{"name":"Na Zi Shi Fa"},
+      "feiteng_bafa":{"name":"Fei Teng Ba Fa"},
+      "yingsui_buxie":{"name":"Ying Sui Bu Xie"},
+      "niandu_wuyun":{"name":"Nian Du Wu Yun"},
+      "niandu_liuqi":{"name":"Nian Du Liu Qi"},
+      "liubu_qiji":{"name":"Liu Bu Qi Ji"},
+      "niandu_yunqi_zonglan":{"name":"Nian Du Wu Yun Liu Qi Zong Lan"},
+      "xiao_liuren":{"name":"Xiao Liu Ren Shi Gua"},
+      "huangji_jingshi":{"name":"Huang Ji Jing Shi Zhi Yue Gua"},
+      "meihua_yishu":{"name":"Mei Hua Yi Shu Shi Gua"},
+      "iching_reader":{"name":"I Ching Hexagram"},
+      "liuyao_shifa":{"name":"Liu Yao Shi Fa Zhan Bu"},
+      "fuxingjue_zangfg_yongyaofa":{"name":"Fuxing Jue Zang Fg Yong Yao Fa"},
+      "shanghan_zabinglun":{"name":"Shang Han Za bing Lun"}
     },
     "button": {
       "reset_to_today": { "name": "Return to Today" }
@@ -77,10 +90,18 @@
         "state": {
           "实时随动": "Real-time Follow"
         }
-      }
+      },
+      "fuxingjue_viscera": { "name": "Fuxing Jue Viscera Selection" },
+      "symptom_selector": { "name": "Symptom Selector" },
+      "shanghan_channel": { "name": "Shang Han Channel" },
+      "shanghan_syndrome_selector": { "name": "Shang Han Syndrome Selection" },
+      "shanghan_formula_selector": { "name": "Shang Han Formula Selection" }
     },
     "date": {
       "date_navigator": { "name": "Base Date Switch" }
+    },
+    "text": {
+      "liuyaozhanbu_input": { "name": "Liu Yao Zhan Bu Text Input" }
     }
   }
 }
