@@ -3,6 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/hzonz/ha_tianyuan_calendar)](https://github.com/hzonz/ha_tianyuan_calendar/releases)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/hzonz/ha_tianyuan_calendar/blob/main/LICENSE)
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+![](https://komarev.com/ghpvc/?username=hzonz&color=ff69b4)
 
 ## 天元历法不再仅仅是历法传感器，它是一个深度整合中国传统“天文、术数、医学”的智能引擎。通过真太阳时修正，为用户提供精确的排盘、取穴与卦象预测。
 
