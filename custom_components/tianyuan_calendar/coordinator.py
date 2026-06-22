@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import math
 import logging
+import asyncio
+from datetime import time as dt_time
 from datetime import datetime, date, timedelta
 from typing import Any, TypedDict
 
@@ -26,7 +28,10 @@ from .tianyuan import (
     易经详注类,
 )
 
-# 导入配置常量（保持英文，HA 依赖）
+# 从 cache_service 导入工业级缓存类
+from .cache_service import CacheService
+
+# 导入配置常量
 from .const import (
     DOMAIN,
     LOGGER,
@@ -90,6 +95,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         self.性别: str = "男"
         self.选中卦名: str | None = None
         self.六爻输入字符串 = "阳阳阳阴阴阴"
+        
         # --- 辅行诀联动状态 ---
         self.辅行诀选中大类 = "肝"
         self.辅行诀选中症状 = "胁下痛"
@@ -97,6 +103,9 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         self.伤寒选中六经 = "太阳"
         self.伤寒选中证型 = "太阳-表寒实"
         self.伤寒选中方名 = "麻黄汤"
+
+        # --- 初始化高级缓存服务 (容量500) ---
+        self._cache = CacheService(capacity=500)
 
         刷新间隔分钟 = entry.options.get(CONF_REFRESH_INTERVAL, 1)
 
@@ -118,75 +127,197 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
 
         return dt + timedelta(minutes=经度偏移分钟 + 时间方程)
 
-    # 主更新逻辑
+    # 异步更新主入口：负责调度缓存逻辑
     async def _async_update_data(self) -> TianYuanData:
-        """异步更新数据"""
-        return await self.hass.async_add_executor_job(self._获取同步数据)
-
-
-    def _获取同步数据(self) -> TianYuanData:
-        """同步计算主逻辑"""
-
+        """主计算任务：协调多级缓存、计算模式与实时开关"""
+        
         当前时间 = dt_util.now()
         实时模式 = self.查看日期 is None
-
         基准时间 = (
             当前时间 if 实时模式
             else datetime.combine(self.查看日期, 当前时间.time()).replace(tzinfo=当前时间.tzinfo)
         )
 
-        # 计算真太阳时
+        # 获取当前配置模式 (ST/TST) 和 经度
+        模式 = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
         经度 = float(self.entry.options.get(CONF_CUSTOM_LONGITUDE, 120.0))
-        真太阳时 = self._calculate_tst(基准时间, 经度)
+        开启岐黄 = self.entry.options.get(CONF_ENABLE_QIHUANG, False)
+        开启术数 = self.entry.options.get(CONF_ENABLE_SHUSHU, False)
 
-        # 创建农历体系
+        # 计算真太阳时 (实时计算，不缓存)
+        真太阳时 = self._calculate_tst(基准时间, 经度)
+        
+        # 核心：将“模式”加入键名，防止模式切换时读取错误的缓存
+        tst_date_str = 真太阳时.strftime('%Y-%m-%d')
+        temp_lunar = Lunar.fromDate(真太阳时)
+        时辰名 = temp_lunar.getTimeZhi()
+        
+        # 日级缓存键：D_日期_模式 (例如: D_2026-06-22_pro)
+        day_key = f"D_{tst_date_str}_{模式}"
+        # 时级缓存键：H_日期_时辰_性别_模式 (注：术数虽多用TST，但统一Key结构更稳健)
+        hour_key = f"H_{tst_date_str}_{时辰名}_{self.性别}_{模式}"
+
+        # 获取日级静态数据 (包含：农历、阳历、假期、节气、全量属性、年运)
+        日级数据 = await self._cache.get_or_set(
+            day_key,
+            lambda: self.hass.async_add_executor_job(self._获取同步日级基础数据类, 真太阳时, 基准时间, 模式),
+            ttl=86400
+        )
+
+        # 增加安全校验，防止 data_key 不存在导致的崩溃
+        if not isinstance(日级数据, dict):
+            日级数据 = {}
+        # 初始化本次返回的数据包 (深拷贝防止污染缓存)
+        数据: TianYuanData = 日级数据.copy()
+
+        # 获取时级动态数据 (受 岐黄 和 术数 开关控制)
+        # 如果两个开关都关了，不进入缓存逻辑
+        if 开启岐黄 or 开启术数:
+            时级基础数据 = await self._cache.get_or_set(
+                hour_key,
+                lambda: self.hass.async_add_executor_job(self._获取同步时级动态数据类, 真太阳时, 模式),
+                ttl=7200
+            )
+            
+            # 根据开关状态，从时级缓存中提取特定数据
+            if 开启岐黄:
+                # 提取：纳甲、纳子、灵龟、飞腾、迎随、当前气步、年度运气总览
+                数据.update({k: v for k, v in 时级基础数据.items() if k in [
+                    "纳甲筮法数据", "纳子筮法数据", "灵龟八法数据", 
+                    "飞腾八法数据", "迎随补泻数据", "六步气机数据", "年度运气总览数据"
+                ]})
+                # 辅行诀与伤寒基于 UI 实时选择进行计算 (不进缓存)
+                数据["辅行诀结果数据"] = 辅行诀脏腑用药法要类.辅行诀选方类(self.辅行诀选中症状)
+                数据["伤寒结果数据"] = 伤寒杂病论类.获取方剂数据类(self.伤寒选中方名)
+            
+            if 开启术数:
+                # 提取：小六壬、梅花、皇极
+                数据.update({k: v for k, v in 时级基础数据.items() if k in [
+                    "小六壬数据", "梅花易数数据", "皇极经世数据"
+                ]})
+                # 易经阅读器实时覆盖处理
+                当前时卦名 = 数据.get("梅花易数数据", {}).get("state")
+                目标卦名 = self.选中卦名 if self.选中卦名 else 当前时卦名
+                数据["易经名称数据"] = 目标卦名
+                数据["易经信息数据"] = 易经详注类.获取详注包装类(目标卦名)
+                # 六爻输入实时计算
+                数据["六爻爻法数据"] = 六爻占卜类.执行占卜流程类(self.六爻输入字符串, 数据["农历"])
+        else:
+            # 开关未开启，补全空字典避免传感器报错
+            数据.update({
+                "纳甲筮法数据": {}, "纳子筮法数据": {}, "灵龟八法数据": {}, "飞腾八法数据": {},
+                "迎随补泻数据": {}, "六步气机数据": {}, "年度运气总览数据": {},
+                "辅行诀结果数据": {}, "伤寒结果数据": {}, "小六壬数据": {}, 
+                "梅花易数数据": {}, "皇极经世数据": {}, "六爻爻法数据": {},
+                "易经名称数据": "", "易经信息数据": {},
+            })
+
+        # 注入最后一步实时参数
+        数据.update({
+            "真太阳时": 真太阳时,
+            "实时模式": 实时模式,
+            "性别": self.性别,
+        })
+
+        return 数据
+
+    # 静态构建器：增加 模式(mode) 参数支持
+    def _获取同步日级基础数据类(self, 真太阳时: datetime, 基准时间: datetime, 模式: str) -> dict:
+        """日级构建器：严格遵循模式选择"""
+        
         标准农历 = Lunar.fromDate(基准时间)
         真太阳时农历 = Lunar.fromDate(真太阳时)
         阳历 = Solar.fromDate(真太阳时)
 
-        # 模式选择
-        模式 = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
+        # 模式判定：决定传感器主实体显示的“宇宙”
         主农历 = 真太阳时农历 if 模式 == MODE_TST else 标准农历
 
-        # 构建中文化数据结构
-        数据: TianYuanData = {
+        return {
             "农历": 主农历,
             "阳历": 阳历,
-            "真太阳时": 真太阳时,
-            "实时模式": 实时模式,
-            "性别": self.性别,
             "假期数据": self._获取假期数据类(标准农历, 阳历, 基准时间),
             "节气数据": self._获取节气数据类(标准农历, 阳历),
-            "十二时辰数据": self._获取十二时辰数据类(标准农历, 基准时间),         
+            "十二时辰数据": self._获取十二时辰数据类(标准农历, 基准时间),
             "全量属性数据": self._获取全量属性数据类(主农历, 阳历),
+            # 基础农历设备的更多实体（跟随模式选择）
             "真太阳时数据": self._获取真太阳时类(真太阳时农历, 真太阳时),
             "四柱八字数据": self._获取八字类(真太阳时农历),
             "天干地支数据": self._获取干支类(真太阳时农历),
             "十二天神数据": self._获取天神类(真太阳时农历),
             "当日冲煞数据": self._获取冲煞类(真太阳时农历),
-            "东方星宿数据": self._获取星宿类(真太阳时农历),            
-            # 岐黄相关数据
-            "纳甲筮法数据": {}, "纳子筮法数据": {}, "灵龟八法数据": {}, "飞腾八法数据": {},
-            "迎随补泻数据": {}, "六步气机数据": {},
-            "年度运气总览数据": {}, "辅行诀结果数据": {}, "伤寒结果数据": {},
-            # 术数相关数据
-            "小六壬数据": {}, "梅花易数数据": {}, "皇极经世数据": {}, "六爻爻法数据": {},
-            "易经名称数据": "", "易经信息数据": {},
+            "东方星宿数据": self._获取星宿类(真太阳时农历),
         }
 
-        # 开启岐黄开关才执行
-        if self.entry.options.get(CONF_ENABLE_QIHUANG):
-            岐黄结果 = self._构建天元岐黄类(真太阳时农历, 真太阳时)
-            数据.update(岐黄结果)
+    def _获取同步时级动态数据类(self, 真太阳时: datetime, 模式: str) -> dict:
+        """时级构建器：术数与岐黄动态计算"""
+        
+        # 术数和子午流注在本质上应严格基于真太阳时
+        农历 = Lunar.fromDate(真太阳时)
+        阳历 = Solar.fromDate(真太阳时)
 
+        运气结果 = 五运六气类.全量计算类(农历)
+        
+        return {
+            "纳甲筮法数据": 子午流注类.纳甲法类(农历),
+            "纳子筮法数据": 子午流注类.纳子法类(真太阳时),
+            "灵龟八法数据": 子午流注类.灵龟八法类(农历, self.性别),
+            "飞腾八法数据": 子午流注类.飞腾八法类(农历),
+            "迎随补泻数据": 子午流注类.迎随补泻类(农历, 真太阳时),
+            "六步气机数据": 运气结果["六步运气数据"],
+            "年度运气总览数据": 运气结果["年度总览数据"],
+            "小六壬数据": 小六壬类.起卦类(农历),
+            "梅花易数数据": 梅花易数类.起卦类(农历),
+            "皇极经世数据": 皇极经世类.起卦类(农历, 阳历),
+        }
 
-        # 开启术数开关才执行
-        if self.entry.options.get(CONF_ENABLE_SHUSHU):
-            术数结果 = self._构建天元术数类(真太阳时农历, 阳历)
-            数据.update(术数结果)
+    # 月历缓存接口
+    async def 获取月历缓存包类(self, 采样日期: date) -> list[dict]:
+        """
+        计算采样日期所在月的 42 天完整数据包（对齐周日起点）。
+        """
+        # 找到该月 1 号
+        本月第一天 = 采样日期.replace(day=1)
+        
+        # 找到日历矩阵的起点 (该周的周日)
+        偏移 = (本月第一天.weekday() + 1) % 7 
+        日历起点 = 本月第一天 - timedelta(days=偏移)
+        
+        # 锁定计算模式
+        模式 = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
+        
+        结果 = []
+        for i in range(42):
+            当前日期 = 日历起点 + timedelta(days=i)
+            键 = f"D_{当前日期.strftime('%Y-%m-%d')}_{模式}"
+            
+            采样时间 = datetime.combine(
+                当前日期, 
+                dt_time(12, 0)
+            ).replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+            
+            # 命中或创建日级缓存
+            单日数据 = await self._cache.get_or_set(
+                键,
+                lambda: self.hass.async_add_executor_job(self._获取同步日级基础数据类, 采样时间, 采样时间, 模式),
+                ttl=86400
+            )
+            
+            假期 = 单日数据["假期数据"]
+            节气 = 单日数据["节气数据"]
 
-        return 数据
+            # 提取字段
+            结果.append({
+                "日期": 当前日期.isoformat(),
+                "节气": 节气["state"].replace("今天是", "") if "今天是" in 节气["state"] else "",
+                "阳历节日": 假期["当天节日"]["阳历节日"][0] if 假期["当天节日"]["阳历节日"][0] != "无阳历节日" else "",
+                "农历节日": 假期["当天节日"]["农历节日"][0] if 假期["当天节日"]["农历节日"][0] != "无农历节日" else "",
+                "是否工作日": 假期["假期信息"]["是否工作日"] == "是",
+                "全量属性": 单日数据["全量属性数据"],
+                "是否本月": 当前日期.month == 采样日期.month
+            })
+        return 结果
 
+    # 以下为原有的逻辑方法 (保持代码顺序与注释)
     def _获取假期数据类(self, 农历, 阳历, dt):
         """假期信息"""
 
@@ -330,7 +461,6 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     # --- 辅行诀级联动作 ---
     async def 写入辅行诀大类类(self, 大类: str):
         self.辅行诀选中大类 = 大类
-        # 联动：改变大类后，症状列表会变，我们自动选该大类的第一个症状
         症状列表 = 辅行诀脏腑用药法要类.获取大类症状法(大类)
         self.辅行诀选中症状 = 症状列表[0] if 症状列表 else ""
         await self.async_refresh()
@@ -341,9 +471,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
 
     # --- 伤寒论级联动作 ---
     async def 写入伤寒六经类(self, 六经: str):
-        """第一级触发：选经"""
         self.伤寒选中六经 = 六经
-        # 立即计算该经下的证型
         证型列表 = 伤寒杂病论类.获取经下所有证型法(六经)
         if 证型列表:
             self.伤寒选中证型 = 证型列表[0]
@@ -355,29 +483,24 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
 
     async def 写入伤寒证型类(self, 证型: str):
         self.伤寒选中证型 = 证型
-
         方名列表 = 伤寒杂病论类.获取证型下所有方名法(证型)
         if 方名列表:
             self.伤寒选中方名 = 方名列表[0]
         await self.async_refresh()
 
     async def 写入伤寒方名类(self, 方名: str):
-        # 用户也可以直接在过滤后的方名列表里选
         self.伤寒选中方名 = 方名
         await self.async_refresh()
 
     async def 选择实体选卦名类(self, 卦名: str):
-        """由 Select 实体调用（设置选中卦名）"""
         self.选中卦名 = 卦名
         await self.async_refresh()
 
-    # 增加供 Text 实体调用的方法
     async def 写入六爻输入类(self, value: str):
-        """设置六爻输入字符串并刷新"""
         self.六爻输入字符串 = value
         await self.async_refresh()
 
-    # --- 更多实体子逻辑 ---
+    # --- 获取各子项数据类 ---
     def _获取真太阳时类(self, 农历, 真太阳时):
         return {
             "state": f"{农历.getTimeZhi()}时",
@@ -402,11 +525,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
                 "纳音": f"{八字.getYearNaYin()}, {八字.getMonthNaYin()}, {八字.getDayNaYin()}, {八字.getTimeNaYin()}",
                 "十神": f"{八字.getYearShiShenGan()}, {八字.getMonthShiShenGan()}, {八字.getDayShiShenGan()}, {八字.getTimeShiShenGan()}",
                 "地势": f"{八字.getYearDiShi()}, {八字.getMonthDiShi()}, {八字.getDayDiShi()}, {八字.getTimeDiShi()}",
-                "其他": {
-                    "胎元": 八字.getTaiYuan(),
-                    "命宫": 八字.getMingGong(),
-                    "身宫": 八字.getShenGong()
-                }
+                "其他": {"胎元": 八字.getTaiYuan(), "命宫": 八字.getMingGong(), "身宫": 八字.getShenGong()}
             }
         }
 
@@ -420,18 +539,8 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
                     "月": f"{农历.getMonthInGanZhiExact()}月",
                     "日": f"{农历.getDayInGanZhiExact2()}日"
                 },
-                "纳音": {
-                    "年": 农历.getYearNaYin(),
-                    "月": 农历.getMonthNaYin(),
-                    "日": 农历.getDayNaYin(),
-                    "时": 农历.getTimeNaYin()
-                },
-                "生肖": {
-                    "年": 农历.getYearShengXiaoExact(),
-                    "月": 农历.getMonthShengXiaoExact(),
-                    "日": 农历.getDayShengXiao(),
-                    "时": 农历.getDayShengXiao()
-                }
+                "纳音": {"年": 农历.getYearNaYin(), "月": 农历.getMonthNaYin(), "日": 农历.getDayNaYin(), "时": 农历.getTimeNaYin()},
+                "生肖": {"年": 农历.getYearShengXiaoExact(), "月": 农历.getMonthShengXiaoExact(), "日": 农历.getDayShengXiao(), "时": 农历.getDayShengXiao()}
             }
         }
 
@@ -463,19 +572,15 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     def _获取星宿类(self, 农历):
         return {
             "state": f"{农历.getGong()}方{农历.getXiu()}{农历.getZheng()}{农历.getAnimal()}-{农历.getXiuLuck()}",
-            "attributes": {
-                "歌诀": 农历.getXiuSong()
-            }
+            "attributes": {"歌诀": 农历.getXiuSong()}
         }
 
     def _获取全量属性数据类(self, l: Lunar, s: Solar) -> dict[str, Any]:
         """构建全量农历属性字段"""
-
         return {
             "农历": f"{l.getMonthInChinese()}月{l.getDayInChinese()}",
             "星期": f"星期{l.getWeekInChinese()}",
-            "天干地支": f"{l.getYearInGanZhiExact()}{l.getYearShengXiaoExact()}年 "
-                       f"{l.getMonthInGanZhiExact()}月 {l.getDayInGanZhiExact2()}日",
+            "天干地支": f"{l.getYearInGanZhiExact()}{l.getYearShengXiaoExact()}年 {l.getMonthInGanZhiExact()}月 {l.getDayInGanZhiExact2()}日",
             "日禄": l.getDayLu(),
             "物候": f"{l.getHou()} {l.getWuHou()}",
             "六曜": l.getLiuYao(),
@@ -505,53 +610,27 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "九星": l.getDayNineStar().toFullString()
         }
 
-    def _构建天元岐黄类(self, 真太阳时农历, 真太阳时):
-        """构建天元岐黄"""
-
-        纳甲筮法 = 子午流注类.纳甲法类(真太阳时农历)
-        纳子筮法 = 子午流注类.纳子法类(真太阳时)
-        灵龟八法 = 子午流注类.灵龟八法类(真太阳时农历, self.性别)
-        飞腾八法 = 子午流注类.飞腾八法类(真太阳时农历)
-        迎随补泻 = 子午流注类.迎随补泻类(真太阳时农历, 真太阳时)
-        五运六气 = 五运六气类.全量计算类(真太阳时农历)
-        六步运气 = 五运六气["六步运气数据"]
-        年度总览 = 五运六气["年度总览数据"]
-        辅行诀结果 = 辅行诀脏腑用药法要类.辅行诀选方类(self.辅行诀选中症状)
-        伤寒结果 = 伤寒杂病论类.获取方剂数据类(self.伤寒选中方名)
-
+    # 核心构建器 (仅供缓存服务内部调用)
+    def _构建天元岐黄数据包(self, 农历, 真太阳时):
+        """构建岐黄（中医相关）数据"""
         return {
-            "纳甲筮法数据": 纳甲筮法,
-            "纳子筮法数据": 纳子筮法,
-            "灵龟八法数据": 灵龟八法,
-            "飞腾八法数据": 飞腾八法,
-            "迎随补泻数据": 迎随补泻,
-            "六步气机数据": 六步运气,
-            "年度运气总览数据": 年度总览,
-            "辅行诀结果数据": 辅行诀结果,
-            "伤寒结果数据": 伤寒结果,
+            "纳甲筮法数据": 子午流注类.纳甲法类(农历),
+            "纳子筮法数据": 子午流注类.纳子法类(真太阳时),
+            "灵龟八法数据": 子午流注类.灵龟八法类(农历, self.性别),
+            "飞腾八法数据": 子午流注类.飞腾八法类(农历),
+            "迎随补泻数据": 子午流注类.迎随补泻类(农历, 真太阳时),
+            "五运六气": 五运六气类.全量计算类(农历)
         }
 
-    def _构建天元术数类(self, 真太阳时农历, 阳历):
-        """构建天元术数"""
-
-        小六壬 = 小六壬类.起卦(真太阳时农历)
-        梅花易数 = 梅花易数类.起卦(真太阳时农历)
-        皇极经世 = 皇极经世类.起卦(真太阳时农历, 阳历)
-        六爻筮法 = 六爻占卜类.执行占卜流程类(self.六爻输入字符串, 真太阳时农历)
-
-        当前时卦名 = 梅花易数.get("state")
-        显示卦名 = self.选中卦名 if self.选中卦名 else 当前时卦名
-        卦信息 = 易经详注类.获取详注包装类(显示卦名)
-
+    def _构建天元术数数据包(self, 农历, 阳历):
+        """构建术数（占卜起卦相关）数据"""
         return {
-            "梅花易数数据": 梅花易数,
-            "皇极经世数据": 皇极经世,
-            "小六壬数据": 小六壬,
-            "六爻筮法数据": 六爻筮法,
-            "易经名称数据": 显示卦名,
-            "易经信息数据": 卦信息,
+            "小六壬数据": 小六壬类.起卦类(农历),
+            "梅花易数数据": 梅花易数类.起卦类(农历),
+            "皇极经世数据": 皇极经世类.起卦类(农历, 阳历),
         }
 
+    # 设备与集成属性
     @property
     def device_info(self):
         """定义设备模型."""
