@@ -294,7 +294,7 @@ class TianYuanGenericSensor(TianYuanSensorBase):
         if key == "main_lunar":
             return self.coordinator.data.get("全量属性数据", {})
 
-        if key == "shiershichen":
+        if key == "shier_shichen":
             return self.coordinator.data.get("十二时辰数据", {}).get("data", {})
 
         return self.coordinator.data.get(self.entity_description.data_key, {})
@@ -316,7 +316,7 @@ class TianYuanAdvancedSensor(TianYuanSensorBase):
 
 # 岐黄传感器类
 class TianYuanQihuangSensor(TianYuanQihuangBaseEntity, TianYuanSensorBase):
-    """岐黄设备专用，取 summary 作为状态"""
+    """岐黄设备专用"""
     @property
     def native_value(self) -> StateType:
         raw = self.coordinator.data.get(self.entity_description.data_key)
@@ -329,7 +329,7 @@ class TianYuanQihuangSensor(TianYuanQihuangBaseEntity, TianYuanSensorBase):
 
 # 术数实体类
 class TianYuanShushuSensor(TianYuanShushuBaseEntity, TianYuanSensorBase):
-    """术数设备专用，取 state 作为状态"""
+    """术数设备专用"""
     @property
     def native_value(self) -> StateType:
         raw = self.coordinator.data.get(self.entity_description.data_key)
