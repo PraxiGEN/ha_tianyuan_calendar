@@ -73,6 +73,17 @@ class TianYuanLiuYaoInput(TianYuanShushuBaseEntity, TextEntity):
 
         return getattr(self.coordinator, "六爻输入字符串", "阳阳阳阴阴阴")
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """在属性中写入详细的输入规则说明"""
+        return {
+            "输入规则": "由左至右对应【初爻】至【上爻】",
+            "符号说明": "数字1或汉字'阳'代表阳爻；数字0或汉字'阴'代表阴爻",
+            "动爻说明": "使用减号'-'分隔，后跟动爻位置(1-6)",
+            "输入示例": "111000-1 代表初爻发动的本卦；阳阳阳阴阴阴-6 代表上爻变",
+            "温馨提示": "支持空格和逗号分隔，系统会自动识别"
+        }
+
     async def async_set_value(self, value: str) -> None:
         """用户在界面输入值后触发"""
         await self.coordinator.写入六爻输入类(value)

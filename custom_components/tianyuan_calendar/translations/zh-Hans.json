@@ -101,7 +101,7 @@
       "date_navigator": { "name": "基准日期切换" }
     },
     "text": {
-      "liuyaozhanbu_input": { "name": "六爻爻法文本输入" }
+      "liuyaozhanbu_input": { "name": "六爻筮法文本输入" }
     }
   }
 }

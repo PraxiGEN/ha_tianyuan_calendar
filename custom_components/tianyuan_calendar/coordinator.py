@@ -201,14 +201,14 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
                 数据["易经名称数据"] = 目标卦名
                 数据["易经信息数据"] = 易经详注类.获取详注包装类(目标卦名)
                 # 六爻输入实时计算
-                数据["六爻爻法数据"] = 六爻占卜类.执行占卜流程类(self.六爻输入字符串, 数据["农历"])
+                数据["六爻筮法数据"] = 六爻占卜类.执行占卜流程类(self.六爻输入字符串, 数据["农历"])
         else:
             # 开关未开启，补全空字典避免传感器报错
             数据.update({
                 "纳甲筮法数据": {}, "纳子筮法数据": {}, "灵龟八法数据": {}, "飞腾八法数据": {},
                 "迎随补泻数据": {}, "六步气机数据": {}, "年度运气总览数据": {},
                 "辅行诀结果数据": {}, "伤寒结果数据": {}, "小六壬数据": {}, 
-                "梅花易数数据": {}, "皇极经世数据": {}, "六爻爻法数据": {},
+                "梅花易数数据": {}, "皇极经世数据": {}, "六爻筮法数据": {},
                 "易经名称数据": "", "易经信息数据": {},
             })
 
@@ -633,7 +633,6 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     # 设备与集成属性
     @property
     def device_info(self):
-        """定义设备模型."""
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry.entry_id)},
             name="TianYuan Lunar",
@@ -647,10 +646,9 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
 
     @property
     def qihuang_device_info(self):
-        """子设备：天元岐黄."""
         return DeviceInfo(
-            identifiers={(DOMAIN, f"{self.entry.entry_id}_qihuang")}, # 独立的设备 ID
-            name="TianYuan QiHuang",
+            identifiers={(DOMAIN, f"{self.entry.entry_id}_qihuang")},
+            name="TianYuan Qihuang",
             translation_key="tianyuan_qihuang",
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
@@ -661,14 +659,13 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
 
     @property
     def shushu_device_info(self):
-        """子设备：天元术数."""
         return DeviceInfo(
-            identifiers={(DOMAIN, f"{self.entry.entry_id}_shushu")}, # 独立的设备 ID
-            name="TianYuan ShuShu",
+            identifiers={(DOMAIN, f"{self.entry.entry_id}_shushu")},
+            name="TianYuan Shushu",
             translation_key="tianyuan_shushu",
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",
             via_device=(DOMAIN, self.entry.entry_id),
             model="观天之道，执天之行，尽矣。",
-        )   
+        )
