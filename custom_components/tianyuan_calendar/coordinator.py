@@ -117,7 +117,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         )
 
     # 真太阳时计算
-    def _calculate_tst(self, dt: datetime, 经度: float) -> datetime:
+    def _计算真太阳时类(self, dt: datetime, 经度: float) -> datetime:
         """计算真太阳时（True Solar Time）"""
 
         经度偏移分钟 = (经度 - 120) * 4
@@ -145,12 +145,13 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         开启术数 = self.entry.options.get(CONF_ENABLE_SHUSHU, False)
 
         # 计算真太阳时 (实时计算，不缓存)
-        真太阳时 = self._calculate_tst(基准时间, 经度)
+        真太阳时 = self._计算真太阳时类(基准时间, 经度)
         
         # 核心：将“模式”加入键名，防止模式切换时读取错误的缓存
         tst_date_str = 真太阳时.strftime('%Y-%m-%d')
-        temp_lunar = Lunar.fromDate(真太阳时)
-        时辰名 = temp_lunar.getTimeZhi()
+        标准农历 = Lunar.fromDate(基准时间)
+        真太阳时农历 = Lunar.fromDate(真太阳时)
+        时辰名 = 真太阳时农历.getTimeZhi()
         
         # 日级缓存键：D_日期_模式 (例如: D_2026-06-22_pro)
         day_key = f"D_{tst_date_str}_{模式}"
@@ -217,6 +218,8 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "真太阳时": 真太阳时,
             "实时模式": 实时模式,
             "性别": self.性别,
+            "真太阳时数据": self._获取真太阳时类(真太阳时农历, 真太阳时),
+            "十二时辰数据": self._获取十二时辰数据类(标准农历, 基准时间),
         })
 
         return 数据
@@ -227,20 +230,18 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         
         标准农历 = Lunar.fromDate(基准时间)
         真太阳时农历 = Lunar.fromDate(真太阳时)
-        阳历 = Solar.fromDate(真太阳时)
+        真太阳时阳历 = Solar.fromDate(真太阳时)
 
         # 模式判定：决定传感器主实体显示的“宇宙”
         主农历 = 真太阳时农历 if 模式 == MODE_TST else 标准农历
 
         return {
             "农历": 主农历,
-            "阳历": 阳历,
-            "假期数据": self._获取假期数据类(标准农历, 阳历, 基准时间),
-            "节气数据": self._获取节气数据类(标准农历, 阳历),
-            "十二时辰数据": self._获取十二时辰数据类(标准农历, 基准时间),
-            "全量属性数据": self._获取全量属性数据类(主农历, 阳历),
+            "阳历": 真太阳时阳历,
+            "假期数据": self._获取假期数据类(标准农历, 真太阳时阳历, 基准时间),
+            "节气数据": self._获取节气数据类(标准农历, 真太阳时阳历),
+            "全量属性数据": self._获取全量属性数据类(主农历, 真太阳时阳历),
             # 基础农历设备的更多实体（跟随模式选择）
-            "真太阳时数据": self._获取真太阳时类(真太阳时农历, 真太阳时),
             "四柱八字数据": self._获取八字类(真太阳时农历),
             "天干地支数据": self._获取干支类(真太阳时农历),
             "十二天神数据": self._获取天神类(真太阳时农历),
@@ -252,22 +253,22 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
         """时级构建器：术数与岐黄动态计算"""
         
         # 术数和子午流注在本质上应严格基于真太阳时
-        农历 = Lunar.fromDate(真太阳时)
-        阳历 = Solar.fromDate(真太阳时)
+        真太阳时农历 = Lunar.fromDate(真太阳时)
+        真太阳时阳历 = Solar.fromDate(真太阳时)
 
-        运气结果 = 五运六气类.全量计算类(农历)
+        运气结果 = 五运六气类.全量计算类(真太阳时农历)
         
         return {
-            "纳甲筮法数据": 子午流注类.纳甲法类(农历),
+            "纳甲筮法数据": 子午流注类.纳甲法类(真太阳时农历),
             "纳子筮法数据": 子午流注类.纳子法类(真太阳时),
-            "灵龟八法数据": 子午流注类.灵龟八法类(农历, self.性别),
-            "飞腾八法数据": 子午流注类.飞腾八法类(农历),
-            "迎随补泻数据": 子午流注类.迎随补泻类(农历, 真太阳时),
+            "灵龟八法数据": 子午流注类.灵龟八法类(真太阳时农历, self.性别),
+            "飞腾八法数据": 子午流注类.飞腾八法类(真太阳时农历),
+            "迎随补泻数据": 子午流注类.迎随补泻类(真太阳时农历, 真太阳时),
             "六步气机数据": 运气结果["六步运气数据"],
             "年度运气总览数据": 运气结果["年度总览数据"],
-            "小六壬数据": 小六壬类.起卦类(农历),
-            "梅花易数数据": 梅花易数类.起卦类(农历),
-            "皇极经世数据": 皇极经世类.起卦类(农历, 阳历),
+            "小六壬数据": 小六壬类.起卦类(真太阳时农历),
+            "梅花易数数据": 梅花易数类.起卦类(真太阳时农历),
+            "皇极经世数据": 皇极经世类.起卦类(真太阳时农历, 真太阳时阳历),
         }
 
     # 月历缓存接口
