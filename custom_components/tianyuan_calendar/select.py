@@ -159,7 +159,7 @@ class TianYuanQihuangSelect(TianYuanQihuangBaseEntity, SelectEntity):
         
         # 性别选项是固定的
         if dtype == SELECT_TYPE_GENDER:
-            return ["男", "女"]
+            return ["male", "female"]
             
         if dtype == "fuxingjue_viscera":
             return 辅行诀脏腑用药法要类.获取所有大类法()

@@ -41,7 +41,7 @@ SELECT_TYPE_GENDER = "gender"
 SELECT_TYPE_ICHING = "iching"
 
 # --- 特殊选项文本 ---
-OPTION_ICHING_SYNC = "实时随动"
+OPTION_ICHING_SYNC = "real_time_follow"
 
 # 默认值
 DEFAULT_REFRESH_INTERVAL: Final = 1  # 默认刷新频率 (分钟)
