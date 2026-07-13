@@ -81,14 +81,14 @@
       "gender": {
         "name": "ZiWu Flow Gender Selection",
         "state": {
-          "男": "Male",
-          "女": "Female"
+          "male": "Male",
+          "female": "Female"
         }
       },
       "iching_selector": {
         "name": "I Ching Reading Selector",
         "state": {
-          "实时随动": "Real-time Follow"
+          "real_time_follow": "Real-time Follow"
         }
       },
       "fuxingjue_viscera": { "name": "Fuxing Jue Viscera Selection" },

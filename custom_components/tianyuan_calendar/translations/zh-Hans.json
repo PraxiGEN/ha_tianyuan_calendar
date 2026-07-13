@@ -81,14 +81,14 @@
       "gender": {
         "name": "子午流注性别选择",
         "state": {
-          "男": "男",
-          "女": "女"
+          "male": "男",
+          "female": "女"
         }
       },
       "iching_selector": {
         "name": "易经查阅选择",
         "state": {
-          "实时随动": "实时随动"
+          "real_time_follow": "实时随动"
         }
       },
       "fuxingjue_viscera": { "name": "辅行诀大类选择" },
