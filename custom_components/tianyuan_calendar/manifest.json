@@ -3,11 +3,11 @@
   "name": "TianYuan Calendar",
   "codeowners": ["@hzonz"],
   "config_flow": true,
-  "dependencies": ["http"],
+  "dependencies": [],
   "documentation": "https://github.com/hzonz/ha_tianyuan_calendar",
   "integration_type": "service",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/hzonz/ha_tianyuan_calendar/issues",
   "requirements": ["lunar-python==1.4.8"],
-  "version": "1.0.9"
+  "version": "1.0.10"
 }
