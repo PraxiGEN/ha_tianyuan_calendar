@@ -1,4 +1,4 @@
-"""TianYuan (天元农历) 核心协调器 """
+"""TianYuan 核心协调器 """
 # 干支纪日：晚子时日柱算当天
 # 干支纪年：新年以立春节气交接的时刻起算
 from __future__ import annotations

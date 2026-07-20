@@ -1,4 +1,4 @@
-"""TianYuan (天元农历) - 核心集成引导文件"""
+"""TianYuan 集成入口"""
 from __future__ import annotations
 
 import os

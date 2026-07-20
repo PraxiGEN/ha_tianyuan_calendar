@@ -1,4 +1,4 @@
-"""TianYuan (天元农历) 传感器平台"""
+"""TianYuan 传感器平台"""
 from __future__ import annotations
 
 from dataclasses import dataclass

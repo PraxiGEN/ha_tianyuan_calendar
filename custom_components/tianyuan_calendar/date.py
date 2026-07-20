@@ -1,4 +1,4 @@
-"""TianYuan (天元农历) 日期导航平台."""
+"""TianYuan 日期导航平台."""
 from __future__ import annotations
 from datetime import date
 
