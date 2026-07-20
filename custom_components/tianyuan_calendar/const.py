@@ -1,4 +1,4 @@
-"""Constants for the TianYuan (天元农历) integration."""
+"""TianYuan 常量"""
 from __future__ import annotations
 
 import logging
@@ -14,6 +14,7 @@ PLATFORMS: Final = [
     Platform.SENSOR,
     Platform.SELECT,
     Platform.BUTTON,
+    Platform.CALENDAR,
     Platform.DATE,
     Platform.TEXT,
 ]

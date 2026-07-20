@@ -1,4 +1,4 @@
-"""Config flow for TianYuan (天元农历)."""
+"""TianYuan 配置流实现."""
 from __future__ import annotations
 
 from typing import Any

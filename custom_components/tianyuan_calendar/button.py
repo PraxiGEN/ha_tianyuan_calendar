@@ -1,4 +1,4 @@
-"""TianYuan (天元农历) 按钮平台."""
+"""TianYuan 按钮平台."""
 from __future__ import annotations
 
 from homeassistant.components.button import (
