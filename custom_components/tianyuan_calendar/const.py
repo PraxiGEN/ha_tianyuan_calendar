@@ -14,6 +14,7 @@ PLATFORMS: Final = [
     Platform.SENSOR,
     Platform.SELECT,
     Platform.BUTTON,
+    Platform.CALENDAR,
     Platform.DATE,
     Platform.TEXT,
 ]

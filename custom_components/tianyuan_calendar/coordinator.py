@@ -4,8 +4,6 @@
 from __future__ import annotations
 
 import math
-import logging
-import asyncio
 from datetime import time as dt_time
 from datetime import datetime, date, timedelta
 from typing import Any, TypedDict
@@ -14,6 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
+from homeassistant.components.calendar import CalendarEvent
 
 # 导入外部算法库和工具类
 from .tianyuan import (
@@ -179,7 +178,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
                 lambda: self.hass.async_add_executor_job(self._获取同步时级动态数据类, 真太阳时, 模式),
                 ttl=7200
             )
-            
+            if not 时级基础数据: 时级基础数据 = {}
             # 根据开关状态，从时级缓存中提取特定数据
             if 开启岐黄:
                 # 提取：纳甲、纳子、灵龟、飞腾、迎随、当前气步、年度运气总览
@@ -630,6 +629,139 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "梅花易数数据": 梅花易数类.起卦类(农历),
             "皇极经世数据": 皇极经世类.起卦类(农历, 阳历),
         }
+
+    def _构建单日历事件数据类(self, 单日缓存数据: dict, 目标日期: date) -> dict:
+        """将内部缓存字典转化为 CalendarEvent 所需的字典参数"""
+        属性 = 单日缓存数据.get("全量属性数据", {})
+        假期 = 单日缓存数据.get("假期数据", {})
+        节气 = 单日缓存数据.get("节气数据", {})
+
+        标题项 = [属性.get("农历", "")]
+        节气名 = 节气.get("state", "").replace("今天是", "") if "今天是" in 节气.get("state", "") else ""
+        if 节气名: 标题项.append(节气名)
+        
+        if 假期.get("当天节日"):
+            阳历 = 假期["当天节日"].get("阳历节日", [])
+            农历 = 假期["当天节日"].get("农历节日", [])
+            有效节日 = [f for f in (阳历 + 农历) if "无" not in f]
+            标题项.extend(有效节日)
+
+        描述 = (
+            f"农历 {属性.get('农历')} · {属性.get('星期')}\n"
+            f"〖干支〗{属性.get('天干地支')}\n"
+            f"〖建除〗{属性.get('建除日')}\n"
+            f"〖神煞〗吉神: {属性.get('吉神')} / 凶煞: {属性.get('凶煞')}\n"
+            f"〖彭祖〗{属性.get('彭祖干')} {属性.get('彭祖支')}"
+            f"〖宜〗{属性.get('宜')}\n"
+            f"〖忌〗{属性.get('忌')}\n"
+        )
+
+        return {
+            "start": 目标日期,
+            "end": 目标日期 + timedelta(days=1),
+            "summary": " | ".join(filter(None, 标题项)),
+            "description": 描述,
+            "location": 属性.get("东方星宿")
+        }
+
+    async def 获取日历事件范围数据类(self, 开始日期: date, 结束日期: date) -> list[CalendarEvent]:
+        """批量获取并拆分多行事件，每行对应专属的描述信息"""
+
+        模式 = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
+        结果 = []
+        
+        当前日期 = 开始日期
+        while 当前日期 < 结束日期:
+            键 = f"D_{当前日期.strftime('%Y-%m-%d')}_{模式}"
+            采样时间 = datetime.combine(当前日期, dt_time(12, 0)).replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
+            
+            日数据 = await self._cache.get_or_set(
+                键,
+                lambda: self.hass.async_add_executor_job(self._获取同步日级基础数据类, 采样时间, 采样时间, 模式),
+                ttl=86400
+            )
+            
+            if 日数据 and "全量属性数据" in 日数据:
+                属性 = 日数据["全量属性数据"]
+                假期 = 日数据["假期数据"]
+                节气 = 日数据["节气数据"]
+
+                农历描述 = (
+                    f"【历法】农历 {属性.get('农历')} · {属性.get('星期')}\n"
+                    f"【物候】{属性.get('物候')}\n"
+                    f"【月相】{属性.get('月相')}\n"
+                    f"【季节】{属性.get('季节')}\n"
+                    f"【九星】{属性.get('九星')}"
+                )
+                结果.append(CalendarEvent(
+                    start=当前日期,
+                    end=当前日期 + timedelta(days=1),
+                    summary=属性.get("农历", ""),
+                    description=农历描述,
+                    location="农历日期"
+                ))
+
+                标题项 = []
+                节气名 = 节气.get("state", "").replace("今天是", "") if "今天是" in 节气.get("state", "") else ""
+                if 节气名: 标题项.append(节气名)
+                if 假期.get("当天节日"):
+                    阳历 = 假期["当天节日"].get("阳历节日", [])
+                    农历 = 假期["当天节日"].get("农历节日", [])
+                    有效节日 = [f for f in (阳历 + 农历) if "无" not in f]
+                    标题项.extend(有效节日)
+                
+                if 标题项:
+                    节气描述 = (
+                        f"【时令】{节气.get('上一节气')} ➔ {节气.get('下一节气')}\n"
+                        f"【节日】{' / '.join(标题项)}\n"
+                        f"【性质】{'法定节假日' if 假期['假期信息']['是否工作日'] == '否' else '工作日'}"
+                    )
+                    结果.append(CalendarEvent(
+                        start=当前日期,
+                        end=当前日期 + timedelta(days=1),
+                        summary=" | ".join(filter(None, 标题项)),
+                        description=节气描述,
+                        location="节日节气"
+                    ))
+
+                # --- 干支拆分逻辑 ---
+                干支全文 = 属性.get('天干地支', '')
+                干支部分 = 干支全文.split(' ')
+                if len(干支部分) >= 3:
+                    年柱描述 = (
+                        f"【岁次】{干支部分[0]}\n"
+                        f"【日禄】{属性.get('日禄')}\n"
+                        f"【太岁】{属性.get('太岁')}\n"
+                        f"【胎神】{属性.get('胎神')}"
+                    )
+                    结果.append(CalendarEvent(
+                        start=当前日期,
+                        end=当前日期 + timedelta(days=1),
+                        summary=干支部分[0],
+                        description=年柱描述,
+                        location="年干支"
+                    ))
+                    
+                    月日描述 = (
+                        f"【月日】{干支部分[1]} {干支部分[2]}\n"
+                        f"【建除】{属性.get('建除日')}\n"
+                        f"【宜】{属性.get('宜')}\n"
+                        f"【忌】{属性.get('忌')}\n"
+                        f"【冲煞】{属性.get('冲煞')}\n"
+                        f"【彭祖】{属性.get('彭祖干')} / {属性.get('彭祖支')}\n"
+                        f"【神煞】吉神: {属性.get('吉神')} | 凶煞: {属性.get('凶煞')}"
+                    )
+                    结果.append(CalendarEvent(
+                        start=当前日期,
+                        end=当前日期 + timedelta(days=1),
+                        summary=f"{干支部分[1]} {干支部分[2]}",
+                        description=月日描述,
+                        location="月日干支"
+                    ))
+                
+            当前日期 += timedelta(days=1)
+            
+        return 结果
 
     # 设备与集成属性
     @property
