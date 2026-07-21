@@ -91,4 +91,14 @@ https://github.com/hzonz/ha_tianyuan_calendar
 本集成提供的数据仅供传统文化研究与居家参考使用。涉及中医养生及择日等信息时，请结合专业建议。
 
 ---
-**兼容版本**: Home Assistant 2024.5+
+
+## 兼容版本: 
+
+- **Home Assistant 2026.1+**
+  
+  本集成最低兼容 HA 2026.1 及以上版本。
+
+- **为确保集成品牌图片正确显示，请选择 Home Assistant 2026.3+**
+  
+  为确保品牌图标能够正确显示，建议使用 HA 2026.3 或更高版本。
+  从 2026.3 起，Home Assistant 引入了 custom_integrations 目录与 Brands Proxy API，自定义集成可以在自身目录中直接包含品牌图片。
