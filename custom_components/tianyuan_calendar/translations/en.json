@@ -23,10 +23,18 @@
           "custom_longitude": "Geographic Longitude (for True Solar Time calibration)",
           "refresh_interval": "Refresh Interval (minutes)",
           "calc_mode": "Calculation Mode",
+          "enable_more": "Enable Additional Advanced Entities",
           "enable_qihuang": "Enable TianYuan Qihuang",
           "enable_shushu": "Enable TianYuan Divination",
-          "enable_more": "Enable Additional Advanced Entities",
+          "manage_birthdays": "Manage Family Birthdays List",
           "system_token": "System Token"
+        }
+      },
+      "birthdays": {
+        "title": "Family Birthdays Management",
+        "description": "### Please enter the family members' birthdays.\nFormat: Name Birth Date [Lunar]. Example: Zhang San 1994-04-26\nor: Li Si 1995-05-20 农历",
+        "data": {
+          "birthdays": "Family Birthdays List"
         }
       }
     }
@@ -73,6 +81,10 @@
       "liuyao_shifa":{"name":"Liu Yao Shi Fa Zhan Bu"},
       "fuxingjue_zangfg_yongyaofa":{"name":"Fuxing Jue Zang Fg Yong Yao Fa"},
       "shanghan_zabinglun":{"name":"Shang Han Za bing Lun"}
+    },
+    "calendar": {
+      "lunar_almanac": { "name": "TianYuan Calendar" },
+      "birthday_reminder": { "name": "Birthday Reminder" }
     },
     "button": {
       "reset_to_today": { "name": "Return to Today" }

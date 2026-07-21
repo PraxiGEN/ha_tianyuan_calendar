@@ -15,8 +15,10 @@ from .const import (
     CONF_CUSTOM_LONGITUDE,
     CONF_ENABLE_SHUSHU,
     CONF_ENABLE_QIHUANG,
+    CONF_ENABLE_SHENGRI,
     CONF_ENABLE_MORE,
     CONF_CALC_MODE,
+    CONF_BIRTHDAYS,
     MODE_ST,
     MODE_TST,
     CONF_SYS_TOKEN,
@@ -66,14 +68,23 @@ class TianYuanConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
     """配置修改界面：显示所有高级选项."""
 
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    def __init__(self) -> None:
+        """初始化时准备一个临时容器存储第一页的数据."""
+        self._temp_options = {}
 
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """基础配置与开关."""
         if user_input is not None:
-            enable_qihuang = user_input.get(CONF_ENABLE_QIHUANG)
-            enable_shushu = user_input.get(CONF_ENABLE_SHUSHU)
-            if not enable_qihuang or not enable_shushu:
-                user_input[CONF_SYS_TOKEN] = ""
-            return self.async_create_entry(title="", data=user_input)
+
+            self._temp_options.update(user_input)
+            
+            if not user_input.get(CONF_ENABLE_QIHUANG) or not user_input.get(CONF_ENABLE_SHUSHU):
+                self._temp_options[CONF_SYS_TOKEN] = ""
+
+            if user_input.get(CONF_ENABLE_SHENGRI):
+                return await self.async_step_birthdays()
+        
+            return self.async_create_entry(title="", data=self._temp_options)
         
         # 获取当前已保存的选项
         opts = self.config_entry.options
@@ -97,6 +108,7 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Required(CONF_ENABLE_MORE, default=bool(opts.get(CONF_ENABLE_MORE, False))): selector.BooleanSelector(),
             vol.Required(CONF_ENABLE_QIHUANG, default=bool(opts.get(CONF_ENABLE_QIHUANG, False))): selector.BooleanSelector(),
             vol.Required(CONF_ENABLE_SHUSHU, default=bool(opts.get(CONF_ENABLE_SHUSHU, False))): selector.BooleanSelector(),
+            vol.Optional(CONF_ENABLE_SHENGRI, default=False): selector.BooleanSelector(),
         }
 
         if opts.get(CONF_ENABLE_QIHUANG) and opts.get(CONF_ENABLE_SHUSHU):
@@ -114,3 +126,27 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(schema_dict)
         )
+    
+    async def async_step_birthdays(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """专门的生日管理页面."""
+        if user_input is not None:
+
+            self._temp_options.update(user_input)
+            self._temp_options.pop(CONF_ENABLE_SHENGRI, None)
+            return self.async_create_entry(title="", data=self._temp_options)
+
+        opts = self.config_entry.options
+        return self.async_show_form(
+            step_id="birthdays",
+            data_schema=vol.Schema({
+
+                vol.Optional(CONF_BIRTHDAYS, default=opts.get(CONF_BIRTHDAYS, [])): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=[],
+                        multiple=True,
+                        custom_value=True,
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+            })
+        ) 

@@ -23,10 +23,18 @@
           "custom_longitude": "地理经度 (用于真太阳时校准)",
           "refresh_interval": "刷新频率 (分钟)",
           "calc_mode": "计算基准模式",
+          "enable_more": "开启更多高级实体",
           "enable_qihuang": "开启天元岐黄",
           "enable_shushu": "开启天元术数",
-          "enable_more": "开启更多高级实体",
+          "manage_birthdays": "配置/修改家人生日清单",
           "system_token": "系统令牌"
+        }
+      },
+      "birthdays": {
+        "title": "生日管理",
+        "description": "### 请输入生日信息。\n格式：姓名 出生日期 [农历]。\n- 张三1994-04-26\n- 李四 1995-05-20 农历",
+        "data": {
+          "birthdays": "生日列表"
         }
       }
     }
@@ -73,6 +81,10 @@
       "liuyao_shifa": { "name": "六爻筮法" },
       "fuxingjue_zangfu_yongyaofa": { "name": "辅行诀脏腑用药法" },
       "shanghan_zabinglun": { "name": "伤寒杂病论" }
+    },
+    "calendar": {
+      "lunar_almanac": { "name": "天元历法" },
+      "birthday_reminder": { "name": "生日提醒" }
     },
     "button": {
       "reset_to_today": { "name": "回到今天" }

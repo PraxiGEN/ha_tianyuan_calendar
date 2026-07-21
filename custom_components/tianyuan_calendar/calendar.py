@@ -1,8 +1,9 @@
-"""TianYuan 日历平台."""
+"""TianYuan (天元历法) 日历平台."""
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, date, timedelta 
+from datetime import datetime
+
 from homeassistant.components.calendar import (
     CalendarEntity,
     CalendarEntityDescription,
@@ -17,13 +18,22 @@ from .entity import TianYuanBaseEntity
 
 @dataclass(frozen=True, kw_only=True)
 class TianYuanCalendarEntityDescription(CalendarEntityDescription):
-    """天元日历描述符扩展."""
+    """扩展描述符：增加 cal_type 字段用于逻辑分发."""
+    cal_type: str 
 
-# 定义实体描述符
-LUNAR_CALENDAR_DESCRIPTION = TianYuanCalendarEntityDescription(
-    key="lunar_almanac",
-    translation_key="lunar_almanac",
-    icon="mdi:calendar-text", 
+TIANYUAN_CALENDAR_ENTITIES: tuple[TianYuanCalendarEntityDescription, ...] = (
+    TianYuanCalendarEntityDescription(
+        key="lunar_almanac",
+        translation_key="lunar_almanac",
+        icon="mdi:calendar-text",
+        cal_type="almanac",
+    ),
+    TianYuanCalendarEntityDescription(
+        key="birthday_reminder",
+        translation_key="birthday_reminder",
+        icon="mdi:cake-variant",
+        cal_type="birthday",
+    ),
 )
 
 async def async_setup_entry(
@@ -31,18 +41,19 @@ async def async_setup_entry(
     entry: TianYuanConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """设置天元农历日历实体平台."""
+    """设置日历实体平台."""
     coordinator = entry.runtime_data
     
-    # 注册实体
     async_add_entities([
-        TianYuanCalendarEntity(coordinator, entry, LUNAR_CALENDAR_DESCRIPTION)
+        TianYuanCalendarEntity(coordinator, entry, description)
+        for description in TIANYUAN_CALENDAR_ENTITIES
     ])
 
 class TianYuanCalendarEntity(TianYuanBaseEntity, CalendarEntity):
-    """天元历书实体."""
+    """天元通用日历实体类."""
 
     entity_description: TianYuanCalendarEntityDescription
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator, entry, description):
         super().__init__(coordinator)
@@ -50,25 +61,43 @@ class TianYuanCalendarEntity(TianYuanBaseEntity, CalendarEntity):
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
         self._attr_translation_key = description.translation_key
 
+    def _get_target_date(self):
+        """获取参考日期."""
+        return self.coordinator.查看日期 or dt_util.now().date()
+
     @property
     def event(self) -> CalendarEvent | None:
-        """返回当前的日历事件摘要（联动协调器的最新数据与查阅日期）."""
+        """根据类型动态分发今日摘要逻辑."""
         data = self.coordinator.data
-        if not data or "全量属性数据" not in data:
+        if not data:
             return None
-            
-        目标日期 = self.coordinator.查看日期 or dt_util.now().date()
-        事件字典 = self.coordinator._构建单日历事件数据类(data, 目标日期)
+
+        # 根据描述符中的 cal_type 决定调用哪个方法
+        cal_type = self.entity_description.cal_type
         
-        return CalendarEvent(**事件字典)
+        if cal_type == "almanac":
+            if "全量属性数据" not in data: return None
+            事件字典 = self.coordinator._构建单日历事件数据类(data, self._get_target_date())
+        else:
+            # 生日逻辑
+            事件字典 = self.coordinator._构建单生日日历事件数据类(data, self._get_target_date())
+        
+        return CalendarEvent(**事件字典) if 事件字典 else None
 
     async def async_get_events(
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
     ) -> list[CalendarEvent]:
-        """向协调器请求指定范围的事件列表. """
-        # 直接调用协调器提供的稳健接口
-        return await self.coordinator.获取日历事件范围数据类(
-            start_date.date(), 
-            end_date.date()
-        )
-    
+        """根据类型动态分发范围查询逻辑."""
+        cal_type = self.entity_description.cal_type
+        
+        if cal_type == "almanac":
+            return await self.coordinator.获取日历事件范围数据类(
+                start_date.date(), 
+                end_date.date()
+            )
+        else:
+            # 生日逻辑
+            return await self.coordinator.获取生日日历事件范围类(
+                start_date.date(), 
+                end_date.date()
+            )
