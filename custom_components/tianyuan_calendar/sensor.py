@@ -295,7 +295,7 @@ class TianYuanGenericSensor(TianYuanSensorBase):
             return self.coordinator.data.get("全量属性数据", {})
 
         if key == "shier_shichen":
-            return self.coordinator.data.get("十二时辰数据", {}).get("data", {})
+            return self.coordinator.data.get("十二时辰数据", {}).get("attributes", {})
 
         return self.coordinator.data.get(self.entity_description.data_key, {})
 
