@@ -26,15 +26,15 @@
           "enable_more": "Enable Additional Advanced Entities",
           "enable_qihuang": "Enable TianYuan Qihuang",
           "enable_shushu": "Enable TianYuan Divination",
-          "manage_birthdays": "Manage Family Birthdays List",
+          "manage_birthdays": "Manage Birthdays List",
           "system_token": "System Token"
         }
       },
       "birthdays": {
-        "title": "Family Birthdays Management",
-        "description": "### Please enter the family members' birthdays.\nFormat: Name Birth Date [Lunar]. Example: Zhang San 1994-04-26\nor: Li Si 1995-05-20 农历",
+        "title": "Birthday Management",
+        "description": "### Please enter birthday information, format: Name Date of Birth [Lunar]\n Zhang San 1994-04-26\n Li Si 1995-05-20 Lunar",
         "data": {
-          "birthdays": "Family Birthdays List"
+          "birthdays": "Birthdays List"
         }
       }
     }

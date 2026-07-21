@@ -26,13 +26,13 @@
           "enable_more": "开启更多高级实体",
           "enable_qihuang": "开启天元岐黄",
           "enable_shushu": "开启天元术数",
-          "manage_birthdays": "配置/修改家人生日清单",
+          "manage_birthdays": "配置/修改生日清单",
           "system_token": "系统令牌"
         }
       },
       "birthdays": {
         "title": "生日管理",
-        "description": "### 请输入生日信息。\n格式：姓名 出生日期 [农历]。\n- 张三1994-04-26\n- 李四 1995-05-20 农历",
+        "description": "### 请输入生日信息，格式：姓名 出生日期 [农历]\n 张三1994-04-26\n 李四 1995-05-20 农历",
         "data": {
           "birthdays": "生日列表"
         }
