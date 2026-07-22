@@ -1,13 +1,13 @@
 {
   "domain": "tianyuan_calendar",
   "name": "TianYuan Calendar",
-  "codeowners": ["@hzonz"],
+  "codeowners": ["@PraxiGEN"],
   "config_flow": true,
   "dependencies": ["http"],
-  "documentation": "https://github.com/hzonz/ha_tianyuan_calendar",
+  "documentation": "https://github.com/PraxiGEN/ha_tianyuan_calendar",
   "integration_type": "service",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/hzonz/ha_tianyuan_calendar/issues",
+  "issue_tracker": "https://github.com/PraxiGEN/ha_tianyuan_calendar/issues",
   "requirements": ["lunar-python==1.4.8"],
-  "version": "1.1.2"
+  "version": "1.1.3"
 }
