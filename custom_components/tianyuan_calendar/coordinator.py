@@ -244,53 +244,6 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "皇极经世数据": 皇极经世类.起卦类(真太阳时农历, 真太阳时阳历),
         }
 
-    # 月历缓存接口
-    async def 获取月历缓存包类(self, 采样日期: date) -> list[dict]:
-        """
-        计算采样日期所在月的 42 天完整数据包（对齐周日起点）。
-        """
-        # 找到该月 1 号
-        本月第一天 = 采样日期.replace(day=1)
-        
-        # 找到日历矩阵的起点 (该周的周日)
-        偏移 = (本月第一天.weekday() + 1) % 7 
-        日历起点 = 本月第一天 - timedelta(days=偏移)
-        
-        # 锁定计算模式
-        模式 = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
-        
-        结果 = []
-        for i in range(42):
-            当前日期 = 日历起点 + timedelta(days=i)
-            键 = f"D_{当前日期.strftime('%Y-%m-%d')}_{模式}"
-            
-            采样时间 = datetime.combine(
-                当前日期, 
-                dt_time(12, 0)
-            ).replace(tzinfo=dt_util.DEFAULT_TIME_ZONE)
-            
-            # 命中或创建日级缓存
-            单日数据 = await self._cache.get_or_set(
-                键,
-                lambda: self.hass.async_add_executor_job(self._获取同步日级基础数据类, 采样时间, 采样时间, 模式),
-                ttl=86400
-            )
-            
-            假期 = 单日数据["假期数据"]
-            节气 = 单日数据["节气数据"]
-
-            # 提取字段
-            结果.append({
-                "日期": 当前日期.isoformat(),
-                "节气": 节气["state"].replace("今天是", "") if "今天是" in 节气["state"] else "",
-                "阳历节日": 假期["当天节日"]["阳历节日"][0] if 假期["当天节日"]["阳历节日"][0] != "无阳历节日" else "",
-                "农历节日": 假期["当天节日"]["农历节日"][0] if 假期["当天节日"]["农历节日"][0] != "无农历节日" else "",
-                "是否工作日": 假期["假期信息"]["是否工作日"] == "是",
-                "全量属性": 单日数据["全量属性数据"],
-                "是否本月": 当前日期.month == 采样日期.month
-            })
-        return 结果
-
     # --- 辅行诀级联动作 ---
     async def 写入辅行诀大类类(self, 大类: str):
         self.辅行诀选中大类 = 大类
