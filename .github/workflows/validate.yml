@@ -1,4 +1,4 @@
-name: Validate
+name: Validate with PR
 
 on:
   push:
