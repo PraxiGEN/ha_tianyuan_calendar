@@ -15,6 +15,48 @@ class 天元农历逻辑类:
         假期 = HolidayUtil.getHoliday(dt.year, dt.month, dt.day)
         状态 = "工作日" if 假期 is None or 假期.isWork() else 假期.getName()
 
+        法定名称 = ""
+        是否工作日 = "是"
+        假期标签 = ""
+        
+        if 假期:
+            是否工作日 = "是" if (假期 is None or 假期.isWork()) else "否"
+            if 假期.isWork():
+                # 调休上班
+                法定名称 = f"{假期.getName()}调休"
+                假期标签 = f"[班] {假期.getName()}调休"
+            else:
+                # 法定放假
+                法定名称 = 假期.getName()
+                假期标签 = f"[假] {假期.getName()}"
+        else:
+            # 无国家法定安排，按周末判定
+            周几 = 阳历.getWeek() # 0-6，0是周日
+            是否工作日 = "否" if 周几 == 0 or 周几 == 6 else "是"
+            
+        # 如果是法定特日，状态显示具体名称；否则显示 工作日/休息日
+        if 法定名称:
+            状态 = 法定名称
+        else:
+            状态 = "工作日" if 是否工作日 == "是" else "休息日"
+
+        阳历节日 = 阳历.getFestivals()
+        农历节日 = 农历.getFestivals()
+        # 合并所有节日，过滤掉占位符
+        全部节日 = [f for f in (阳历节日 + 农历节日)]
+        
+        # 构造用于月历格子的显示列表 (带 [假][班] 前缀)
+        显示列表 = []
+        if 假期标签:
+            显示列表.append(假期标签)
+        
+        for f in 全部节日:
+            # 避开与法定名称重复的节日 (例如 5月1日 既是法定也是阳历节日)
+            if 假期 and f == 假期.getName():
+                continue
+            显示列表.append(f)
+
+
         节日列表 = []
         for 偏移天数 in range(-42, 43):
             if 偏移天数 == 0: continue
@@ -31,6 +73,8 @@ class 天元农历逻辑类:
 
         return {
             "state": 状态,
+            "显示列表": 显示列表,
+            "是否工作日": 是否工作日,
             "attributes": {
                 "当天节日": {
                     "阳历节日": 阳历.getFestivals() or ["无阳历节日"],
@@ -39,7 +83,7 @@ class 天元农历逻辑类:
                 "假期信息": {
                     "名称": 假期.getName() if 假期 else "无假期",
                     "类型": "法定节假日" if 假期 and not 假期.isWork() else "工作日",
-                    "是否工作日": "是" if (假期 is None or 假期.isWork()) else "否",
+                    "是否工作日": 是否工作日,
                 },
                 "最近节日": sorted(节日列表, key=lambda x: abs(x["days"]))[:10],
             }
@@ -53,15 +97,21 @@ class 天元农历逻辑类:
         上一 = 农历.getPrevJieQi()
         
         下一日期 = datetime.strptime(下一.getSolar().toYmd(), "%Y-%m-%d")
-        当前日期 = datetime.strptime(阳历.toYmd(), "%Y-%m-%d")
-        天数差 = (下一日期 - 当前日期).days
+        上一日期 = datetime.strptime(上一.getSolar().toYmd(), "%Y-%m-%d")
 
-        状态 = f"今天是{当前.getName()}" if 当前 else f"{天数差}天后是{下一.getName()}"
+        当前日期 = datetime.strptime(阳历.toYmd(), "%Y-%m-%d")
+        天数至下一 = (下一日期 - 当前日期).days # 距离下一节气还有几天
+        天数后上一 = (当前日期 - 上一日期).days # 距离上一节气已过几天
+
+        干净节气名 = 当前.getName() if 当前 else "" 
+        状态 = f"今天是{当前.getName()}" if 当前 else f"{天数至下一}天后是{下一.getName()}"
         return {
             "state": 状态,
+            "节气名": 干净节气名,
             "attributes": {
                 "上一节气": f"{上一.getName()} {上一.getSolar().toYmd()}",
                 "下一节气": f"{下一.getName()} {下一.getSolar().toYmd()}",
+                "已过天数": f"{上一.getName()}后第{天数后上一}天"
             }
         }
 
