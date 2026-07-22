@@ -112,26 +112,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> 
             LOGGER.info("岐黄模式已关闭，正在清理岐黄设备...")
             device_registry.async_remove_device(device.id)
 
-    # 注册月历数据服务
-    async def get_calendar_data(call: ServiceCall) -> ServiceResponse:
-        # 使用 dt_date 别名防止冲突
-        start_date_str = call.data.get("start_date", dt_date.today().isoformat())
-        try:
-            start_date = dt_date.fromisoformat(start_date_str)
-        except (ValueError, TypeError):
-            start_date = dt_date.today()
-            
-        # 返回协调器缓存包
-        return {"days": await coordinator.获取月历缓存包类(start_date)}
-
-    # 注册服务
-    hass.services.async_register(
-        DOMAIN, 
-        "get_calendar_data", 
-        get_calendar_data, 
-        supports_response=SupportsResponse.ONLY
-    )
-
     # 转发平台设置并监听更新
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_update_options))
@@ -146,11 +126,5 @@ async def async_update_options(hass: HomeAssistant, entry: TianYuanConfigEntry) 
 async def async_unload_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> bool:
     """卸载集成实例."""
     LOGGER.debug("正在卸载 TianYuan 集成实例: %s", entry.entry_id)
-    
     # 卸载所有平台
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        # 清理服务
-        hass.services.async_remove(DOMAIN, "get_calendar_data")
-        
-    return unload_ok
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
