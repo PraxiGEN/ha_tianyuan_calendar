@@ -285,7 +285,7 @@ class TianYuanGenericSensor(TianYuanSensorBase):
 
         data_key = self.entity_description.data_key
         res = self.coordinator.data.get(data_key)
-        return res.get("state") if res else None
+        return res.get("state") if isinstance(res, dict) else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -297,7 +297,8 @@ class TianYuanGenericSensor(TianYuanSensorBase):
         if key == "shier_shichen":
             return self.coordinator.data.get("十二时辰数据", {}).get("attributes", {})
 
-        return self.coordinator.data.get(self.entity_description.data_key, {})
+        raw = self.coordinator.data.get(self.entity_description.data_key)
+        return raw.get("attributes", {}) if isinstance(raw, dict) else {}
 
 # 更多实体
 class TianYuanAdvancedSensor(TianYuanSensorBase):
@@ -307,12 +308,12 @@ class TianYuanAdvancedSensor(TianYuanSensorBase):
     def native_value(self) -> StateType:
         # 直接通过 data_key 获取协调器里的中文键对应数据
         raw = self.coordinator.data.get(self.entity_description.data_key)
-        return raw.get("state") if raw else None
+        return raw.get("state") if isinstance(raw, dict) else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         raw = self.coordinator.data.get(self.entity_description.data_key)
-        return raw.get("attributes", {}) if raw else {}
+        return raw.get("attributes", {}) if isinstance(raw, dict) else {}
 
 # 岐黄传感器类
 class TianYuanQihuangSensor(TianYuanQihuangBaseEntity, TianYuanSensorBase):
@@ -320,12 +321,12 @@ class TianYuanQihuangSensor(TianYuanQihuangBaseEntity, TianYuanSensorBase):
     @property
     def native_value(self) -> StateType:
         raw = self.coordinator.data.get(self.entity_description.data_key)
-        return raw.get("state") if raw else None
+        return raw.get("state") if isinstance(raw, dict) else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         raw = self.coordinator.data.get(self.entity_description.data_key)
-        return raw.get("attributes", {}) if raw else {}
+        return raw.get("attributes", {}) if isinstance(raw, dict) else {}
 
 # 术数实体类
 class TianYuanShushuSensor(TianYuanShushuBaseEntity, TianYuanSensorBase):
@@ -333,9 +334,9 @@ class TianYuanShushuSensor(TianYuanShushuBaseEntity, TianYuanSensorBase):
     @property
     def native_value(self) -> StateType:
         raw = self.coordinator.data.get(self.entity_description.data_key)
-        return raw.get("state") if raw else None
+        return raw.get("state") if isinstance(raw, dict) else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         raw = self.coordinator.data.get(self.entity_description.data_key)
-        return raw.get("attributes", {}) if raw else {}
+        return raw.get("attributes", {}) if isinstance(raw, dict) else {}
