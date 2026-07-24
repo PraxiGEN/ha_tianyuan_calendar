@@ -216,7 +216,7 @@ SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
         name="Liu Yao Shi Fa",
         translation_key="liuyao_shifa",
         icon="mdi:podium-gold",
-        data_key="六爻筮法数据",
+        data_key="六爻爻法数据",
         is_private=True,
     ),
 )
