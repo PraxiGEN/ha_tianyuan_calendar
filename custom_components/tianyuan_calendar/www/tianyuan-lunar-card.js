@@ -1,181 +1,88 @@
-(async () => {
-  const CARD_VERSION = "v1.0.0-lit";
-
-  console.log(
-    `%cTianYuan Lunar Card ${CARD_VERSION} Fixed`,
-    "color: #1976d2; font-weight: bold; background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 2px 6px;"
-  );
-  const whenDefined = (t) => customElements.whenDefined(t);
-  await Promise.race([whenDefined("ha-card"), whenDefined("ha-panel-lovelace")]);
-
-  const Lit = window.LitElement || Object.getPrototypeOf(customElements.get("ha-card"));
-  const { html, css } = Lit.prototype;
-
-  class TianYuanLunarCard extends Lit {
-    static get properties() { return { hass: {}, config: {} }; }
-
-    static getGridOptions() { return { rows: "auto", columns: 12 }; }
-
-    static getConfigElement() { return document.createElement("tianyuan-lunar-card-editor"); }
-
-    static getStubConfig(hass) {
-      const auto = Object.keys(hass.states).find(e => e.startsWith("sensor.tianyuan_nong_li_lunar_calenda"));
-      return { type: "custom:tianyuan-lunar-card", entity: auto || "" };
-    }
-
-    setConfig(config) {
-      if (!config) throw new Error("Invalid configuration");
-      this.config = config;
-    }
-
-    _renderTags(text, color) {
-      if (!text || text === "诸事不宜") return html`<span class="tag-item">${text}</span>`;
-      const list = text.includes('.') ? text.split('.') : text.split(' ');
-      return list.map(item => item.trim() ? html`<span class="tag-item" style="border-color:${color}22; background:${color}11">${item.trim()}</span>` : "");
-    }
-
-    render() {
-      if (!this.hass || !this.config) return html``;
-      const stateObj = this.hass.states[this.config.entity];
-
-      if (!stateObj) {
-        return html`
-          <ha-card class="error">
-            <ha-icon icon="mdi:alert-circle-outline"></ha-icon>
-            <div style="margin-top:8px;">未找到农历实体</div>
-            <div style="font-size:10px;opacity:0.6;">请在编辑器中选择 sensor.tianyuan_nong_li_*</div>
-          </ha-card>`;
-      }
-
-      const a = stateObj.attributes;
-
-      return html`
-        <ha-card @click="${this._handleMoreInfo}">
-          <div class="header">
-            <div class="header-left">
-              <div class="lunar-main">农历${stateObj.state}</div>
-              <div class="lunar-sub">${a['天干地支'] || '--'} · ${a['星期'] || '--'}</div>
-            </div>
-            <div class="header-right">
-              <div class="season-tag">${a['季节'] || '--'}</div>
-              <div class="hou-text">${a['物候'] || '--'}</div>
-            </div>
+const t=globalThis,e=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,i=/* @__PURE__ */Symbol(),s=/* @__PURE__ */new WeakMap;let n=class{constructor(t,e,s){if(this._$cssResult$=!0,s!==i)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const i=this.t;if(e&&void 0===t){const e=void 0!==i&&1===i.length;e&&(t=s.get(i)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&s.set(i,t))}return t}toString(){return this.cssText}};const r=(t,...e)=>{const s=1===t.length?t[0]:e.reduce((e,i,s)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[s+1],t[0]);return new n(s,t,i)},o=e?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new n("string"==typeof t?t:t+"",void 0,i))(e)})(t):t,{is:a,defineProperty:l,getOwnPropertyDescriptor:d,getOwnPropertyNames:c,getOwnPropertySymbols:h,getPrototypeOf:p}=Object,u=globalThis,f=u.trustedTypes,$=f?f.emptyScript:"",g=u.reactiveElementPolyfillSupport,_=(t,e)=>t,v={toAttribute(t,e){switch(e){case Boolean:t=t?$:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(s){i=null}}return i}},m=(t,e)=>!a(t,e),y={attribute:!0,type:String,converter:v,reflect:!1,useDefault:!1,hasChanged:m};Symbol.metadata??=/* @__PURE__ */Symbol("metadata"),u.litPropertyMetadata??=/* @__PURE__ */new WeakMap;let A=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=y){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const i=/* @__PURE__ */Symbol(),s=this.getPropertyDescriptor(t,i,e);void 0!==s&&l(this.prototype,t,s)}}static getPropertyDescriptor(t,e,i){const{get:s,set:n}=d(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:s,set(e){const r=s?.call(this);n?.call(this,e),this.requestUpdate(t,r,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??y}static _$Ei(){if(this.hasOwnProperty(_("elementProperties")))return;const t=p(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(_("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(_("properties"))){const t=this.properties,e=[...c(t),...h(t)];for(const i of e)this.createProperty(i,t[i])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,i]of e)this.elementProperties.set(t,i)}this._$Eh=/* @__PURE__ */new Map;for(const[e,i]of this.elementProperties){const t=this._$Eu(e,i);void 0!==t&&this._$Eh.set(t,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(o(t))}else void 0!==t&&e.push(o(t));return e}static _$Eu(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=/* @__PURE__ */new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=/* @__PURE__ */new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=/* @__PURE__ */new Map,e=this.constructor.elementProperties;for(const i of e.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const i=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((i,s)=>{if(e)i.adoptedStyleSheets=s.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const e of s){const s=document.createElement("style"),n=t.litNonce;void 0!==n&&s.setAttribute("nonce",n),s.textContent=e.cssText,i.appendChild(s)}})(i,this.constructor.elementStyles),i}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$ET(t,e){const i=this.constructor.elementProperties.get(t),s=this.constructor._$Eu(t,i);if(void 0!==s&&!0===i.reflect){const n=(void 0!==i.converter?.toAttribute?i.converter:v).toAttribute(e,i.type);this._$Em=t,null==n?this.removeAttribute(s):this.setAttribute(s,n),this._$Em=null}}_$AK(t,e){const i=this.constructor,s=i._$Eh.get(t);if(void 0!==s&&this._$Em!==s){const t=i.getPropertyOptions(s),n="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:v;this._$Em=s;const r=n.fromAttribute(e,t.type);this[s]=r??this._$Ej?.get(s)??r,this._$Em=null}}requestUpdate(t,e,i,s=!1,n){if(void 0!==t){const r=this.constructor;if(!1===s&&(n=this[t]),i??=r.getPropertyOptions(t),!((i.hasChanged??m)(n,e)||i.useDefault&&i.reflect&&n===this._$Ej?.get(t)&&!this.hasAttribute(r._$Eu(t,i))))return;this.C(t,e,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:i,reflect:s,wrapped:n},r){i&&!(this._$Ej??=/* @__PURE__ */new Map).has(t)&&(this._$Ej.set(t,r??e??this[t]),!0!==n||void 0!==r)||(this._$AL.has(t)||(this.hasUpdated||i||(e=void 0),this._$AL.set(t,e)),!0===s&&this._$Em!==t&&(this._$Eq??=/* @__PURE__ */new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,i]of t){const{wrapped:t}=i,s=this[e];!0!==t||this._$AL.has(e)||void 0===s||this.C(e,void 0,i,s)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(i){throw t=!1,this._$EM(),i}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=/* @__PURE__ */new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};A.elementStyles=[],A.shadowRootOptions={mode:"open"},A[_("elementProperties")]=/* @__PURE__ */new Map,A[_("finalized")]=/* @__PURE__ */new Map,g?.({ReactiveElement:A}),(u.reactiveElementVersions??=[]).push("2.1.2");const b=globalThis,x=t=>t,E=b.trustedTypes,w=E?E.createPolicy("lit-html",{createHTML:t=>t}):void 0,S="$lit$",C=`lit$${Math.random().toFixed(9).slice(2)}$`,P="?"+C,O=`<${P}>`,U=document,T=()=>U.createComment(""),k=t=>null===t||"object"!=typeof t&&"function"!=typeof t,H=Array.isArray,M="[ \t\n\f\r]",N=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,j=/-->/g,R=/>/g,z=RegExp(`>|${M}(?:([^\\s"'>=/]+)(${M}*=${M}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),L=/'/g,D=/"/g,I=/^(?:script|style|textarea|title)$/i,B=(Y=1,(t,...e)=>({_$litType$:Y,strings:t,values:e})),W=/* @__PURE__ */Symbol.for("lit-noChange"),V=/* @__PURE__ */Symbol.for("lit-nothing"),q=/* @__PURE__ */new WeakMap,G=U.createTreeWalker(U,129);var Y;function J(t,e){if(!H(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==w?w.createHTML(e):e}class K{constructor({strings:t,_$litType$:e},i){let s;this.parts=[];let n=0,r=0;const o=t.length-1,a=this.parts,[l,d]=((t,e)=>{const i=t.length-1,s=[];let n,r=2===e?"<svg>":3===e?"<math>":"",o=N;for(let a=0;a<i;a++){const e=t[a];let i,l,d=-1,c=0;for(;c<e.length&&(o.lastIndex=c,l=o.exec(e),null!==l);)c=o.lastIndex,o===N?"!--"===l[1]?o=j:void 0!==l[1]?o=R:void 0!==l[2]?(I.test(l[2])&&(n=RegExp("</"+l[2],"g")),o=z):void 0!==l[3]&&(o=z):o===z?">"===l[0]?(o=n??N,d=-1):void 0===l[1]?d=-2:(d=o.lastIndex-l[2].length,i=l[1],o=void 0===l[3]?z:'"'===l[3]?D:L):o===D||o===L?o=z:o===j||o===R?o=N:(o=z,n=void 0);const h=o===z&&t[a+1].startsWith("/>")?" ":"";r+=o===N?e+O:d>=0?(s.push(i),e.slice(0,d)+S+e.slice(d)+C+h):e+C+(-2===d?a:h)}return[J(t,r+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),s]})(t,e);if(this.el=K.createElement(l,i),G.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(s=G.nextNode())&&a.length<o;){if(1===s.nodeType){if(s.hasAttributes())for(const t of s.getAttributeNames())if(t.endsWith(S)){const e=d[r++],i=s.getAttribute(t).split(C),o=/([.?@])?(.*)/.exec(e);a.push({type:1,index:n,name:o[2],strings:i,ctor:"."===o[1]?tt:"?"===o[1]?et:"@"===o[1]?it:X}),s.removeAttribute(t)}else t.startsWith(C)&&(a.push({type:6,index:n}),s.removeAttribute(t));if(I.test(s.tagName)){const t=s.textContent.split(C),e=t.length-1;if(e>0){s.textContent=E?E.emptyScript:"";for(let i=0;i<e;i++)s.append(t[i],T()),G.nextNode(),a.push({type:2,index:++n});s.append(t[e],T())}}}else if(8===s.nodeType)if(s.data===P)a.push({type:2,index:n});else{let t=-1;for(;-1!==(t=s.data.indexOf(C,t+1));)a.push({type:7,index:n}),t+=C.length-1}n++}}static createElement(t,e){const i=U.createElement("template");return i.innerHTML=t,i}}function Z(t,e,i=t,s){if(e===W)return e;let n=void 0!==s?i._$Co?.[s]:i._$Cl;const r=k(e)?void 0:e._$litDirective$;return n?.constructor!==r&&(n?._$AO?.(!1),void 0===r?n=void 0:(n=new r(t),n._$AT(t,i,s)),void 0!==s?(i._$Co??=[])[s]=n:i._$Cl=n),void 0!==n&&(e=Z(t,n._$AS(t,e.values),n,s)),e}class F{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,s=(t?.creationScope??U).importNode(e,!0);G.currentNode=s;let n=G.nextNode(),r=0,o=0,a=i[0];for(;void 0!==a;){if(r===a.index){let e;2===a.type?e=new Q(n,n.nextSibling,this,t):1===a.type?e=new a.ctor(n,a.name,a.strings,this,t):6===a.type&&(e=new st(n,this,t)),this._$AV.push(e),a=i[++o]}r!==a?.index&&(n=G.nextNode(),r++)}return G.currentNode=U,s}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class Q{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,s){this.type=2,this._$AH=V,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=Z(this,t,e),k(t)?t===V||null==t||""===t?(this._$AH!==V&&this._$AR(),this._$AH=V):t!==this._$AH&&t!==W&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>H(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==V&&k(this._$AH)?this._$AA.nextSibling.data=t:this.T(U.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,s="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=K.createElement(J(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===s)this._$AH.p(e);else{const t=new F(s,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=q.get(t.strings);return void 0===e&&q.set(t.strings,e=new K(t)),e}k(t){H(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,s=0;for(const n of t)s===e.length?e.push(i=new Q(this.O(T()),this.O(T()),this,this.options)):i=e[s],i._$AI(n),s++;s<e.length&&(this._$AR(i&&i._$AB.nextSibling,s),e.length=s)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=x(t).nextSibling;x(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class X{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,s,n){this.type=1,this._$AH=V,this._$AN=void 0,this.element=t,this.name=e,this._$AM=s,this.options=n,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=V}_$AI(t,e=this,i,s){const n=this.strings;let r=!1;if(void 0===n)t=Z(this,t,e,0),r=!k(t)||t!==this._$AH&&t!==W,r&&(this._$AH=t);else{const s=t;let o,a;for(t=n[0],o=0;o<n.length-1;o++)a=Z(this,s[i+o],e,o),a===W&&(a=this._$AH[o]),r||=!k(a)||a!==this._$AH[o],a===V?t=V:t!==V&&(t+=(a??"")+n[o+1]),this._$AH[o]=a}r&&!s&&this.j(t)}j(t){t===V?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class tt extends X{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===V?void 0:t}}class et extends X{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==V)}}class it extends X{constructor(t,e,i,s,n){super(t,e,i,s,n),this.type=5}_$AI(t,e=this){if((t=Z(this,t,e,0)??V)===W)return;const i=this._$AH,s=t===V&&i!==V||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,n=t!==V&&(i===V||s);s&&this.element.removeEventListener(this.name,this,i),n&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class st{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){Z(this,t)}}const nt=b.litHtmlPolyfillSupport;nt?.(K,Q),(b.litHtmlVersions??=[]).push("3.3.3");const rt=globalThis;class ot extends A{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,i)=>{const s=i?.renderBefore??e;let n=s._$litPart$;if(void 0===n){const t=i?.renderBefore??null;s._$litPart$=n=new Q(e.insertBefore(T(),t),t,void 0,i??{})}return n._$AI(t),n})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return W}}ot._$litElement$=!0,ot.finalized=!0,rt.litElementHydrateSupport?.({LitElement:ot});const at=rt.litElementPolyfillSupport;at?.({LitElement:ot}),(rt.litElementVersions??=[]).push("4.2.2");console.log("%cTianYuan Lunar Card v1.0.1-lit vite","color: #1976d2; font-weight: bold; background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 2px 6px;");class lt extends ot{static get properties(){return{hass:{},config:{}}}static getGridOptions(){return{rows:"auto",columns:12}}static getConfigElement(){return document.createElement("tianyuan-lunar-card-editor")}static getStubConfig(t){return{type:"custom:tianyuan-lunar-card",entity:Object.keys(t.states).find(t=>t.startsWith("sensor.tianyuan_nong_li_lunar_calenda"))||""}}setConfig(t){if(!t)throw new Error("Invalid configuration");this.config=t}_renderTags(t,e){if(!t||"诸事不宜"===t)return B`<span class="tag-item">${t}</span>`;return(t.includes(".")?t.split("."):t.split(" ")).map(t=>t.trim()?B`<span class="tag-item" style="border-color:${e}22; background:${e}11">${t.trim()}</span>`:"")}render(){if(!this.hass||!this.config)return B``;const t=this.hass.states[this.config.entity];if(!t)return B`
+        <ha-card class="error">
+          <ha-icon icon="mdi:alert-circle-outline"></ha-icon>
+          <div style="margin-top:8px;">未找到农历实体</div>
+          <div style="font-size:10px;opacity:0.6;">请在编辑器中选择 sensor.tianyuan_nong_li_*</div>
+        </ha-card>`;const e=t.attributes;return B`
+      <ha-card @click="${this._handleMoreInfo}">
+        <div class="header">
+          <div class="header-left">
+            <div class="lunar-main">农历${t.state}</div>
+            <div class="lunar-sub">${e["天干地支"]||"--"} · ${e["星期"]||"--"}</div>
           </div>
-
-          <div class="core-grid">
-            <div class="core-item"><div class="core-label">五行建除</div><div class="core-value">${a['建除日'] || '--'}</div></div>
-            <div class="core-item"><div class="core-label">当日冲煞</div><div class="core-value highlight">${a['冲煞'] || '--'}</div></div>
-            <div class="core-item"><div class="core-label">方位星宿</div><div class="core-value">${a['东方星宿'] || '--'}</div></div>
+          <div class="header-right">
+            <div class="season-tag">${e["季节"]||"--"}</div>
+            <div class="hou-text">${e["物候"]||"--"}</div>
           </div>
+        </div>
 
-          <div class="god-section">
-            ${this._renderGod("mdi:yin-yang", "喜神", a['吉神方位']?.['喜神'])}
-            ${this._renderGod("mdi:cash-marker", "财神", a['吉神方位']?.['财神'])}
-            ${this._renderGod("mdi:auto-fix", "福神", a['吉神方位']?.['福神'])}
-          </div>
+        <div class="core-grid">
+          <div class="core-item"><div class="core-label">五行建除</div><div class="core-value">${e["建除日"]||"--"}</div></div>
+          <div class="core-item"><div class="core-label">当日冲煞</div><div class="core-value highlight">${e["冲煞"]||"--"}</div></div>
+          <div class="core-item"><div class="core-label">方位星宿</div><div class="core-value">${e["东方星宿"]||"--"}</div></div>
+        </div>
 
-          <div class="yiji-container">
-            <div class="yiji-row"><div class="yiji-circle yi">宜</div><div class="tag-container">${this._renderTags(a['宜'], "#4caf50")}</div></div>
-            <div class="yiji-row"><div class="yiji-circle ji">忌</div><div class="tag-container">${this._renderTags(a['忌'], "#f44336")}</div></div>
-          </div>
+        <div class="god-section">
+          ${this._renderGod("mdi:yin-yang","喜神",e["吉神方位"]?.["喜神"])}
+          ${this._renderGod("mdi:cash-marker","财神",e["吉神方位"]?.["财神"])}
+          ${this._renderGod("mdi:auto-fix","福神",e["吉神方位"]?.["福神"])}
+        </div>
 
-          <div class="detail-box">
-             <div class="detail-item"><span class="detail-label">吉神：</span><span class="detail-value text-green">${a['吉神'] || '--'}</span></div>
-             <div class="detail-item"><span class="detail-label">凶煞：</span><span class="detail-value text-red">${a['凶煞'] || '--'}</span></div>
-             <div class="detail-item"><span class="detail-label">彭祖：</span><span class="detail-value">${a['彭祖干'] || ''} ${a['彭祖支'] || ''}</span></div>
-          </div>
+        <div class="yiji-container">
+          <div class="yiji-row"><div class="yiji-circle yi">宜</div><div class="tag-container">${this._renderTags(e["宜"],"#4caf50")}</div></div>
+          <div class="yiji-row"><div class="yiji-circle ji">忌</div><div class="tag-container">${this._renderTags(e["忌"],"#f44336")}</div></div>
+        </div>
 
-          <div class="footer">
-            <span>九星：${a['九星']?.split(' ')[0] || '--'}</span>
-            <span>胎神：${a['胎神'] || '--'}</span>
-          </div>
-        </ha-card>`;
-    }
+        <div class="detail-box">
+            <div class="detail-item"><span class="detail-label">吉神：</span><span class="detail-value text-green">${e["吉神"]||"--"}</span></div>
+            <div class="detail-item"><span class="detail-label">凶煞：</span><span class="detail-value text-red">${e["凶煞"]||"--"}</span></div>
+            <div class="detail-item"><span class="detail-label">彭祖：</span><span class="detail-value">${e["彭祖干"]||""} ${e["彭祖支"]||""}</span></div>
+        </div>
 
-    _renderGod(icon, label, value) {
-      return html`<div class="god-item"><ha-icon .icon=${icon}></ha-icon><div><div class="god-label">${label}</div><div class="god-value">${value || '--'}</div></div></div>`;
-    }
-
-    _handleMoreInfo() {
-      this.dispatchEvent(new CustomEvent("hass-more-info", { detail: { entityId: this.config.entity }, bubbles: true, composed: true }));
-    }
-
-    static styles = css`
-      :host { display: block; }
-      ha-card { padding: 20px; border-radius: 12px; background: var(--card-background-color, #fff); cursor: pointer; transition: all 0.3s ease; }
-      .error { padding: 30px; text-align: center; color: var(--secondary-text-color); }
-      .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-      .lunar-main { font-size: 26px; font-weight: bold; color: var(--primary-color); }
-      .lunar-sub { font-size: 14px; opacity: 0.7; margin-top: 2px; }
-      .header-right { text-align: right; }
-      .season-tag { background: var(--primary-color); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; display: inline-block;}
-      .hou-text { font-size: 11px; opacity: 0.5; margin-top: 5px; text-align: right; }
-      .core-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; padding: 12px; background: var(--secondary-background-color); border-radius: 8px; }
-      .core-item { text-align: center; }
-      .core-label { font-size: 10px; opacity: 0.6; margin-bottom: 4px; }
-      .core-value { font-size: 12px; font-weight: 500; }
-      .highlight { color: #f44336; }
-      .god-section { display: flex; justify-content: space-between; margin-bottom: 20px; }
-      .god-item { display: flex; align-items: center; gap: 8px; }
-      .god-item ha-icon { --mdc-icon-size: 20px; color: var(--primary-color); opacity: 0.7; }
-      .god-label { font-size: 10px; opacity: 0.5; }
-      .god-value { font-size: 13px; font-weight: 500; }
-      .yiji-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-      .yiji-row { display: flex; align-items: center; gap: 12px; }
-      .yiji-circle { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 14px; flex-shrink: 0; }
-      .yi { background: #4caf50; }
-      .ji { background: #f44336; }
-      .tag-container { display: flex; flex-wrap: wrap; gap: 6px; }
-      .tag-item { font-size: 12px; padding: 1px 6px; border-radius: 4px; border: 1px solid transparent; white-space: nowrap; }
-      .detail-box { border-top: 1px solid var(--divider-color); padding-top: 15px; display: flex; flex-direction: column; gap: 8px; }
-      .detail-item { font-size: 12px; display: flex; }
-      .detail-label { font-weight: bold; opacity: 0.8; flex-shrink: 0; }
-      .detail-value { line-height: 1.4; padding-left: 4px; }
-      .text-green { color: #4caf50; }
-      .text-red { color: #f44336; }
-      .footer { margin-top: 15px; font-size: 10px; opacity: 0.4; display: flex; justify-content: space-between; }
-    `;
-  }
-
-  class TianYuanLunarCardEditor extends Lit {
-    static get properties() { return { hass: {}, config: {} }; }
-    setConfig(c) { this.config = c; }
-
-    set hass(h) {
-      this._hass = h;
-      // 瞬间锁定逻辑：仅当 entity 键不存在时执行
-      if (h && this.config && !Object.prototype.hasOwnProperty.call(this.config, 'entity')) {
-        const auto = Object.keys(h.states).find(e => 
-          e === "sensor.tianyuan_nong_li_lunar_calenda" || e.startsWith("sensor._tianyuan_nong_li_lunar_calenda")
-        );
-        if (auto) this._upd({ entity: auto });
-      }
-    }
-
-    _upd(v) { this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: { ...this.config, ...v } } })); }
-
-    render() {
-      if (!this.config || !this._hass) return html``;
-      return html`
-        <ha-form
-          .hass=${this._hass}
-          .data=${this.config}
-          .schema=${[{ name: "entity", label: "选择天元农历实体", selector: { entity: { domain: "sensor", integration: "tianyuan_calendar" } } }]}
-          .computeLabel=${s => s.label}
-          @value-changed=${e => this._upd(e.detail.value)}
-        ></ha-form>
-      `;
-    }
-  }
-
-  customElements.define("tianyuan-lunar-card", TianYuanLunarCard);
-  customElements.define("tianyuan-lunar-card-editor", TianYuanLunarCardEditor);
-
-  window.customCards = window.customCards || [];
-  window.customCards.push({
-    type: "tianyuan-lunar-card",
-    name: "TianYuan Lunar Card",
-    preview: false,
-    description: "基于 TianYuan Calendar 的专业农历信息卡片"
-  });
-})();
+        <div class="footer">
+          <span>九星：${e["九星"]?.split(" ")[0]||"--"}</span>
+          <span>胎神：${e["胎神"]||"--"}</span>
+        </div>
+      </ha-card>`}_renderGod(t,e,i){return B`<div class="god-item"><ha-icon .icon=${t}></ha-icon><div><div class="god-label">${e}</div><div class="god-value">${i||"--"}</div></div></div>`}_handleMoreInfo(){this.dispatchEvent(new CustomEvent("hass-more-info",{detail:{entityId:this.config.entity},bubbles:!0,composed:!0}))}static styles=r`
+    :host { display: block; }
+    ha-card { padding: 20px; border-radius: 12px; background: var(--card-background-color, #fff); cursor: pointer; transition: all 0.3s ease; }
+    .error { padding: 30px; text-align: center; color: var(--secondary-text-color); }
+    .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .lunar-main { font-size: 26px; font-weight: bold; color: var(--primary-color); }
+    .lunar-sub { font-size: 14px; opacity: 0.7; margin-top: 2px; }
+    .header-right { text-align: right; }
+    .season-tag { background: var(--primary-color); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; display: inline-block;}
+    .hou-text { font-size: 11px; opacity: 0.5; margin-top: 5px; text-align: right; }
+    .core-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; padding: 12px; background: var(--secondary-background-color); border-radius: 8px; }
+    .core-item { text-align: center; }
+    .core-label { font-size: 10px; opacity: 0.6; margin-bottom: 4px; }
+    .core-value { font-size: 12px; font-weight: 500; }
+    .highlight { color: #f44336; }
+    .god-section { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .god-item { display: flex; align-items: center; gap: 8px; }
+    .god-item ha-icon { --mdc-icon-size: 20px; color: var(--primary-color); opacity: 0.7; }
+    .god-label { font-size: 10px; opacity: 0.5; }
+    .god-value { font-size: 13px; font-weight: 500; }
+    .yiji-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .yiji-row { display: flex; align-items: center; gap: 12px; }
+    .yiji-circle { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 14px; flex-shrink: 0; }
+    .yi { background: #4caf50; }
+    .ji { background: #f44336; }
+    .tag-container { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-item { font-size: 12px; padding: 1px 6px; border-radius: 4px; border: 1px solid transparent; white-space: nowrap; }
+    .detail-box { border-top: 1px solid var(--divider-color); padding-top: 15px; display: flex; flex-direction: column; gap: 8px; }
+    .detail-item { font-size: 12px; display: flex; }
+    .detail-label { font-weight: bold; opacity: 0.8; flex-shrink: 0; }
+    .detail-value { line-height: 1.4; padding-left: 4px; }
+    .text-green { color: #4caf50; }
+    .text-red { color: #f44336; }
+    .footer { margin-top: 15px; font-size: 10px; opacity: 0.4; display: flex; justify-content: space-between; }
+  `}customElements.define("tianyuan-lunar-card",lt),customElements.define("tianyuan-lunar-card-editor",class extends ot{static get properties(){return{hass:{},config:{}}}setConfig(t){this.config=t}set hass(t){if(this._hass=t,t&&this.config&&!Object.prototype.hasOwnProperty.call(this.config,"entity")){const e=Object.keys(t.states).find(t=>"sensor.tianyuan_nong_li_lunar_calenda"===t||t.startsWith("sensor._tianyuan_nong_li_lunar_calenda"));e&&this._upd({entity:e})}}_upd(t){this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:{...this.config,...t}}}))}render(){return this.config&&this._hass?B`
+      <ha-form
+        .hass=${this._hass}
+        .data=${this.config}
+        .schema=${[{name:"entity",label:"选择天元农历实体",selector:{entity:{domain:"sensor",integration:"tianyuan_calendar"}}}]}
+        .computeLabel=${t=>t.label}
+        @value-changed=${t=>this._upd(t.detail.value)}
+      ></ha-form>
+    `:B``}}),window.customCards=window.customCards||[],window.customCards.push({type:"tianyuan-lunar-card",name:"TianYuan Lunar Card",preview:!1,description:"基于 TianYuan Calendar 的专业农历信息卡片"});
