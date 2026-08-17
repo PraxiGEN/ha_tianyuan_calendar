@@ -1,0 +1,41 @@
+name: Run Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # 集成运行期依赖（manifest.json requirements），测试导入链会触发 lunar_python
+          python -m pip install "lunar-python==1.4.8"
+          python -m pip install pytest-homeassistant-custom-component
+          python -m pip install pytest
+          # 集成 manifest 依赖 frontend 组件，其启动需导入 hass_frontend 模块；
+          # 该模块的 PyPI 发布包名为 home-assistant-frontend（非 hass_frontend），须与 homeassistant 2025.1.4 配套
+          python -m pip install "home-assistant-frontend==20250109.2"
+
+      - name: Verify test plugins are importable
+        run: python -c "import pytest_homeassistant_custom_component; print('pytest_homeassistant_custom_component import OK')"
+
+      - name: Verify frontend dependency is importable
+        run: python -c "import hass_frontend; print('hass_frontend import OK')"
+
+      - name: Run pytest
+        run: python -m pytest tests -v
