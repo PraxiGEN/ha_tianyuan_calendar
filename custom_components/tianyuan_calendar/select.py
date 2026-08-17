@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Final
 
 from homeassistant.components.select import (
     SelectEntity,
@@ -14,6 +14,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import TianYuanConfigEntry
 from .entity import TianYuanQihuangBaseEntity, TianYuanShushuBaseEntity
+from .coordinator import TianYuanCoordinator
 from .tianyuan import 易经详注类, 辅行诀脏腑用药法要类, 伤寒杂病论类
 from .tianyuan.maps_loader import 检查专业权限类
 from .const import (
@@ -31,6 +32,11 @@ class TianYuanSelectDescription(SelectEntityDescription):
     """自定义选择器描述符."""
     data_type: str
     is_private: bool = False
+
+# 性别：UI 选项值(英文) 与 协调器内部值(中文) 的映射
+# 协调器内部始终以中文「男/女」存储，避免八字乾造/坤造判定错乱
+GENDER_OPTION_TO_INTERNAL: Final = {"male": "男", "female": "女"}
+GENDER_INTERNAL_TO_OPTION: Final = {"男": "male", "女": "female"}
 
 # 术数设备选择器 (ShuShu)
 SHUSHU_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
@@ -59,6 +65,7 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         translation_key="fuxingjue_viscera",
         icon="mdi:account-heart-outline",
         data_type="fuxingjue_viscera",
+        entity_category=EntityCategory.CONFIG,
         is_private=True,
     ),
     TianYuanSelectDescription(
@@ -66,6 +73,7 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         translation_key="symptom_selector",
         icon="mdi:emoticon-sick-outline",
         data_type="symptom",
+        entity_category=EntityCategory.CONFIG,
         is_private=True,
     ),
     # 伤寒论级联
@@ -74,6 +82,7 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         translation_key="shanghan_channel",
         icon="mdi:pulse",
         data_type="shanghan_channel",
+        entity_category=EntityCategory.CONFIG,
         is_private=True,
     ),
     TianYuanSelectDescription(
@@ -81,6 +90,7 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         translation_key="shanghan_syndrome_selector",
         icon="mdi:thermostat",
         data_type="shanghan_syndrome",
+        entity_category=EntityCategory.CONFIG,
         is_private=True,
     ),
     TianYuanSelectDescription(
@@ -88,6 +98,7 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         translation_key="shanghan_formula_selector",
         icon="mdi:mortar-pestle",
         data_type="shanghan_formula",
+        entity_category=EntityCategory.CONFIG,
         is_private=True,
     ),
 )
@@ -120,9 +131,8 @@ class TianYuanShushuSelect(TianYuanShushuBaseEntity, SelectEntity):
     """归属于天元术数设备的选择器。"""
 
     entity_description: TianYuanSelectDescription
-    _attr_has_entity_name = True
 
-    def __init__(self, coordinator, entry, description):
+    def __init__(self, coordinator: TianYuanCoordinator, entry: TianYuanConfigEntry, description: TianYuanSelectDescription) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
@@ -144,9 +154,8 @@ class TianYuanQihuangSelect(TianYuanQihuangBaseEntity, SelectEntity):
     """归属于天元岐黄设备的选择器，支持动态级联选项。"""
 
     entity_description: TianYuanSelectDescription
-    _attr_has_entity_name = True
 
-    def __init__(self, coordinator, entry, description):
+    def __init__(self, coordinator: TianYuanCoordinator, entry: TianYuanConfigEntry, description: TianYuanSelectDescription) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
@@ -180,7 +189,7 @@ class TianYuanQihuangSelect(TianYuanQihuangBaseEntity, SelectEntity):
         """从协调器读取当前状态，并增加安全过滤。"""
         dtype = self.entity_description.data_type
         
-        if dtype == SELECT_TYPE_GENDER: val = self.coordinator.性别
+        if dtype == SELECT_TYPE_GENDER: val = GENDER_INTERNAL_TO_OPTION.get(self.coordinator.性别)
         elif dtype == "fuxingjue_viscera": val = self.coordinator.辅行诀选中大类
         elif dtype == "symptom": val = self.coordinator.辅行诀选中症状
         elif dtype == "shanghan_channel": val = self.coordinator.伤寒选中六经
@@ -200,7 +209,7 @@ class TianYuanQihuangSelect(TianYuanQihuangBaseEntity, SelectEntity):
         dtype = self.entity_description.data_type
         
         if dtype == SELECT_TYPE_GENDER:
-            self.coordinator.性别 = option
+            self.coordinator.性别 = GENDER_OPTION_TO_INTERNAL.get(option, "男")
             await self.coordinator.async_refresh()
         elif dtype == "fuxingjue_viscera":
             await self.coordinator.写入辅行诀大类类(option)

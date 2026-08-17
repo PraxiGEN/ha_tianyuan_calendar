@@ -10,9 +10,6 @@
           "refresh_interval": "刷新频率 (分钟)"
         }
       }
-    },
-    "abort": {
-      "single_instance_allowed": "天元历法只能配置一个实例。"
     }
   },
   "options": {
@@ -46,48 +43,105 @@
         "pro": "专业模式 (所有数据基于真太阳时)"
       }
     }
-  }, 
+  },
   "device": {
-    "tianyuan_lunar": { "name": "TianYuan 农历" },
-    "tianyuan_qihuang": { "name": "TianYuan 岐黄" },
-    "tianyuan_shushu": { "name": "TianYuan 术数" }
-  },  
+    "tianyuan_lunar": {
+      "name": "TianYuan 农历"
+    },
+    "tianyuan_qihuang": {
+      "name": "TianYuan 岐黄"
+    },
+    "tianyuan_shushu": {
+      "name": "TianYuan 术数"
+    }
+  },
   "entity": {
     "sensor": {
-      "main_lunar": { "name": "农历" },
-      "holiday": { "name": "假期" },
-      "solar_term": { "name": "节气" },
-      "shier_shichen": { "name": "十二时辰" },
-      "tst_time": { "name": "真太阳时" },
-      "sizhu_bazi": { "name": "四柱八字" },
-      "tiangan_dizhi": { "name": "天干地支" },
-      "shier_tianshen": { "name": "十二天神" },
-      "chong_sha": { "name": "冲煞" },
-      "dongfang_xingxiu": { "name": "东方星宿" },
-      "season": { "name": "季节" },
-      "linggui_bafa": { "name": "灵龟八法" },
-      "najia_shifa": { "name": "纳甲筮法" },
-      "nazi_shifa": { "name": "纳子筮法" },
-      "feiteng_bafa": { "name": "飞腾八法" },
-      "yingsui_buxie": { "name": "迎随补泻" },
-      "niandu_wuyun": { "name": "年度五运" },
-      "niandu_liuqi": { "name": "年度六气" },
-      "liubu_qiji": { "name": "六步气机" },
-      "niandu_yunqi_zonglan": { "name": "年度五运六气总览" },
-      "xiao_liuren": { "name": "小六壬时卦" },
-      "huangji_jingshi": { "name": "皇极经世月卦" },
-      "meihua_yishu": { "name": "梅花易数时卦" },
-      "iching_reader": { "name": "易经卦象" },
-      "liuyao_shifa": { "name": "六爻筮法" },
-      "fuxingjue_zangfu_yongyaofa": { "name": "辅行诀脏腑用药法" },
-      "shanghan_zabinglun": { "name": "伤寒杂病论" }
+      "main_lunar": {
+        "name": "农历"
+      },
+      "holiday": {
+        "name": "假期"
+      },
+      "solar_term": {
+        "name": "节气"
+      },
+      "shier_shichen": {
+        "name": "十二时辰"
+      },
+      "tst_time": {
+        "name": "真太阳时"
+      },
+      "sizhu_bazi": {
+        "name": "四柱八字"
+      },
+      "tiangan_dizhi": {
+        "name": "天干地支"
+      },
+      "shier_tianshen": {
+        "name": "十二天神"
+      },
+      "chong_sha": {
+        "name": "冲煞"
+      },
+      "dongfang_xingxiu": {
+        "name": "东方星宿"
+      },
+      "linggui_bafa": {
+        "name": "灵龟八法"
+      },
+      "najia_shifa": {
+        "name": "纳甲筮法"
+      },
+      "nazi_shifa": {
+        "name": "纳子筮法"
+      },
+      "feiteng_bafa": {
+        "name": "飞腾八法"
+      },
+      "yingsui_buxie": {
+        "name": "迎随补泻"
+      },
+      "liubu_qiji": {
+        "name": "六步气机"
+      },
+      "niandu_yunqi_zonglan": {
+        "name": "年度五运六气总览"
+      },
+      "xiao_liuren": {
+        "name": "小六壬时卦"
+      },
+      "huangji_jingshi": {
+        "name": "皇极经世月卦"
+      },
+      "meihua_yishu": {
+        "name": "梅花易数时卦"
+      },
+      "iching_reader": {
+        "name": "易经卦象"
+      },
+      "liuyao_shifa": {
+        "name": "六爻筮法"
+      },
+      "fuxingjue_zangfu_yongyaofa": {
+        "name": "辅行诀脏腑用药法"
+      },
+      "shanghan_zabinglun": {
+        "name": "伤寒杂病论"
+      }
     },
     "calendar": {
-      "lunar_almanac": { "name": "天元历法" },
-      "birthday_reminder": { "name": "生日提醒" }
+      "lunar_almanac": {
+        "name": "天元历法"
+      },
+      "birthday_reminder": {
+        "name": "生日提醒"
+      }
     },
     "button": {
-      "reset_to_today": { "name": "回到今天" }
+      "reset_to_today": {
+        "name": "回到今天"
+      }
     },
     "select": {
       "gender": {
@@ -103,17 +157,31 @@
           "real_time_follow": "实时随动"
         }
       },
-      "fuxingjue_viscera": { "name": "辅行诀大类选择" },
-      "symptom_selector": { "name": "辅行诀症状选择" },
-      "shanghan_channel": { "name": "伤寒六经选择" },
-      "shanghan_syndrome_selector": { "name": "伤寒症状选择" },
-      "shanghan_formula_selector": { "name": "伤寒方剂选择" }
+      "fuxingjue_viscera": {
+        "name": "辅行诀大类选择"
+      },
+      "symptom_selector": {
+        "name": "辅行诀症状选择"
+      },
+      "shanghan_channel": {
+        "name": "伤寒六经选择"
+      },
+      "shanghan_syndrome_selector": {
+        "name": "伤寒症状选择"
+      },
+      "shanghan_formula_selector": {
+        "name": "伤寒方剂选择"
+      }
     },
     "date": {
-      "date_navigator": { "name": "基准日期切换" }
+      "date_navigator": {
+        "name": "基准日期切换"
+      }
     },
     "text": {
-      "liuyaozhanbu_input": { "name": "六爻筮法文本输入" }
+      "liuyaozhanbu_input": {
+        "name": "六爻筮法文本输入"
+      }
     }
   }
 }

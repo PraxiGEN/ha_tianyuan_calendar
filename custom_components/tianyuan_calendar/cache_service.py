@@ -3,9 +3,8 @@
 import time
 import asyncio
 import inspect
-import logging
 from collections import OrderedDict
-from typing import Any, Callable, Awaitable, Optional
+from typing import Any, Callable, Awaitable
 from .const import LOGGER
 
 class CacheService:

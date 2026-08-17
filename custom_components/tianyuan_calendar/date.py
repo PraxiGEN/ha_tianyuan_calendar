@@ -12,12 +12,12 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import TianYuanConfigEntry
 from .entity import TianYuanBaseEntity
-
+from .coordinator import TianYuanCoordinator
 
 TIANYUAN_DATE_ENTITIES: tuple[DateEntityDescription, ...] = (
     DateEntityDescription(
         key="date_navigator",
-        name="Base Date Switch",
+
         translation_key="date_navigator",
         icon="mdi:calendar-search",
         entity_category=EntityCategory.CONFIG,
@@ -39,16 +39,14 @@ async def async_setup_entry(
 
     async_add_entities(entities)
 
-
 class TianYuanDateNavigator(TianYuanBaseEntity, DateEntity):
     """日期导航实体：允许用户在 UI 上直接选择计算基准日."""
 
     entity_description: DateEntityDescription
-    _attr_has_entity_name = True
 
     def __init__(
         self,
-        coordinator,
+        coordinator: TianYuanCoordinator,
         entry: TianYuanConfigEntry,
         description: DateEntityDescription,
     ) -> None:

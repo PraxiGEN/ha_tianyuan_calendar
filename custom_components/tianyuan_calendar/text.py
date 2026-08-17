@@ -9,7 +9,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import TianYuanConfigEntry
 from .tianyuan.maps_loader import 检查专业权限类
 from .entity import TianYuanShushuBaseEntity
-from .const import DOMAIN, CONF_SYS_TOKEN
+from .coordinator import TianYuanCoordinator
+from .const import DOMAIN, CONF_SYS_TOKEN, CONF_ENABLE_SHUSHU
 
 @dataclass(frozen=True, kw_only=True)
 class TianYuanTextEntityDescription(TextEntityDescription):
@@ -21,7 +22,7 @@ class TianYuanTextEntityDescription(TextEntityDescription):
 TIANYUAN_TEXT_ENTITIES: tuple[TianYuanTextEntityDescription, ...] = (
     TianYuanTextEntityDescription(
         key="liuyaozhanbu_input",
-        name="Liu Yao Zhan Bu Text Input",
+
         translation_key="liuyaozhanbu_input",
         icon="mdi:abacus",
         native_min=6, # 缩短最小长度以便调试
@@ -41,7 +42,7 @@ async def async_setup_entry(
     conf = {**entry.data, **entry.options}
     has_pro_access = 检查专业权限类(conf.get(CONF_SYS_TOKEN, ""))
 
-    if not conf.get("enable_shushu"):
+    if not conf.get(CONF_ENABLE_SHUSHU):
         return
 
     entities = []
@@ -61,7 +62,7 @@ class TianYuanLiuYaoInput(TianYuanShushuBaseEntity, TextEntity):
 
     entity_description: TianYuanTextEntityDescription
 
-    def __init__(self, coordinator, entry, description):
+    def __init__(self, coordinator: TianYuanCoordinator, entry: TianYuanConfigEntry, description: TianYuanTextEntityDescription) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
