@@ -3,11 +3,12 @@
   "name": "TianYuan Calendar",
   "codeowners": ["@PraxiGEN"],
   "config_flow": true,
-  "dependencies": ["http"],
+  "dependencies": ["http", "frontend"],
   "documentation": "https://github.com/PraxiGEN/ha_tianyuan_calendar",
   "integration_type": "service",
-  "iot_class": "local_polling",
+  "iot_class": "calculated",
   "issue_tracker": "https://github.com/PraxiGEN/ha_tianyuan_calendar/issues",
   "requirements": ["lunar-python==1.4.8"],
+  "single_config_entry": true,
   "version": "1.1.5"
 }

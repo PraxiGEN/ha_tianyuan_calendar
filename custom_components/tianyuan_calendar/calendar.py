@@ -15,6 +15,7 @@ from homeassistant.util import dt as dt_util
 
 from . import TianYuanConfigEntry
 from .entity import TianYuanBaseEntity
+from .coordinator import TianYuanCoordinator
 
 @dataclass(frozen=True, kw_only=True)
 class TianYuanCalendarEntityDescription(CalendarEntityDescription):
@@ -53,9 +54,8 @@ class TianYuanCalendarEntity(TianYuanBaseEntity, CalendarEntity):
     """天元通用日历实体类."""
 
     entity_description: TianYuanCalendarEntityDescription
-    _attr_has_entity_name = True
 
-    def __init__(self, coordinator, entry, description):
+    def __init__(self, coordinator: TianYuanCoordinator, entry: TianYuanConfigEntry, description: TianYuanCalendarEntityDescription) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"

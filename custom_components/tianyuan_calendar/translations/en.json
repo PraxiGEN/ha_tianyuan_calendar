@@ -10,9 +10,6 @@
           "refresh_interval": "Refresh Interval (minutes)"
         }
       }
-    },
-    "abort": {
-      "single_instance_allowed": "Only one instance of TianYuan Lunar Calendar can be configured."
     }
   },
   "options": {
@@ -48,46 +45,103 @@
     }
   },
   "device": {
-    "tianyuan_lunar": { "name": "TianYuan Lunar" },
-    "tianyuan_qihuang": { "name": "TianYuan Qihuang" },
-    "tianyuan_shushu": { "name": "TianYuan Divination" }
-  },  
+    "tianyuan_lunar": {
+      "name": "TianYuan Lunar"
+    },
+    "tianyuan_qihuang": {
+      "name": "TianYuan Qihuang"
+    },
+    "tianyuan_shushu": {
+      "name": "TianYuan Divination"
+    }
+  },
   "entity": {
     "sensor": {
-      "main_lunar":{"name":"Lunar Calendar"},
-      "holiday":{"name":"Holiday"},
-      "solar_term":{"name":"Solar Term"},
-      "shier_shichen":{"name":"Shi Er Shi Chen"},
-      "tst_time":{"name":"True Solar Time"},
-      "sizhu_bazi":{"name":"Four Pillars of Destiny"},
-      "tiangan_dizhi":{"name":"Heavenly Stems & Earthly Branches"},
-      "shier_tianshen":{"name":"Shi Er Tian Shen"},
-      "chong_sha":{"name":"Chong Sha"},
-      "dongfang_xingxiu":{"name":"Dong Fang Xing Xiu"},
-      "season":{"name":"Season"},
-      "linggu_bafa":{"name":"Ling Gui Ba Fa"},
-      "najia_shifa":{"name":"Na Jia Shi Fa"},
-      "nazi_shifa":{"name":"Na Zi Shi Fa"},
-      "feiteng_bafa":{"name":"Fei Teng Ba Fa"},
-      "yingsui_buxie":{"name":"Ying Sui Bu Xie"},
-      "niandu_wuyun":{"name":"Nian Du Wu Yun"},
-      "niandu_liuqi":{"name":"Nian Du Liu Qi"},
-      "liubu_qiji":{"name":"Liu Bu Qi Ji"},
-      "niandu_yunqi_zonglan":{"name":"Nian Du Wu Yun Liu Qi Zong Lan"},
-      "xiao_liuren":{"name":"Xiao Liu Ren Shi Gua"},
-      "huangji_jingshi":{"name":"Huang Ji Jing Shi Zhi Yue Gua"},
-      "meihua_yishu":{"name":"Mei Hua Yi Shu Shi Gua"},
-      "iching_reader":{"name":"I Ching Hexagram"},
-      "liuyao_shifa":{"name":"Liu Yao Shi Fa Zhan Bu"},
-      "fuxingjue_zangfg_yongyaofa":{"name":"Fuxing Jue Zang Fg Yong Yao Fa"},
-      "shanghan_zabinglun":{"name":"Shang Han Za bing Lun"}
+      "main_lunar": {
+        "name": "Lunar Calendar"
+      },
+      "holiday": {
+        "name": "Holiday"
+      },
+      "solar_term": {
+        "name": "Solar Term"
+      },
+      "shier_shichen": {
+        "name": "Shi Er Shi Chen"
+      },
+      "tst_time": {
+        "name": "True Solar Time"
+      },
+      "sizhu_bazi": {
+        "name": "Four Pillars of Destiny"
+      },
+      "tiangan_dizhi": {
+        "name": "Heavenly Stems & Earthly Branches"
+      },
+      "shier_tianshen": {
+        "name": "Shi Er Tian Shen"
+      },
+      "chong_sha": {
+        "name": "Chong Sha"
+      },
+      "dongfang_xingxiu": {
+        "name": "Dong Fang Xing Xiu"
+      },
+      "linggui_bafa": {
+        "name": "Ling Gui Ba Fa"
+      },
+      "najia_shifa": {
+        "name": "Na Jia Shi Fa"
+      },
+      "nazi_shifa": {
+        "name": "Na Zi Shi Fa"
+      },
+      "feiteng_bafa": {
+        "name": "Fei Teng Ba Fa"
+      },
+      "yingsui_buxie": {
+        "name": "Ying Sui Bu Xie"
+      },
+      "liubu_qiji": {
+        "name": "Liu Bu Qi Ji"
+      },
+      "niandu_yunqi_zonglan": {
+        "name": "Nian Du Wu Yun Liu Qi Zong Lan"
+      },
+      "xiao_liuren": {
+        "name": "Xiao Liu Ren Shi Gua"
+      },
+      "huangji_jingshi": {
+        "name": "Huang Ji Jing Shi Zhi Yue Gua"
+      },
+      "meihua_yishu": {
+        "name": "Mei Hua Yi Shu Shi Gua"
+      },
+      "iching_reader": {
+        "name": "I Ching Hexagram"
+      },
+      "liuyao_shifa": {
+        "name": "Liu Yao Shi Fa Zhan Bu"
+      },
+      "fuxingjue_zangfu_yongyaofa": {
+        "name": "Fuxing Jue Zang Fu Yong Yao Fa"
+      },
+      "shanghan_zabinglun": {
+        "name": "Shang Han Za bing Lun"
+      }
     },
     "calendar": {
-      "lunar_almanac": { "name": "TianYuan Calendar" },
-      "birthday_reminder": { "name": "Birthday Reminder" }
+      "lunar_almanac": {
+        "name": "TianYuan Calendar"
+      },
+      "birthday_reminder": {
+        "name": "Birthday Reminder"
+      }
     },
     "button": {
-      "reset_to_today": { "name": "Return to Today" }
+      "reset_to_today": {
+        "name": "Return to Today"
+      }
     },
     "select": {
       "gender": {
@@ -103,17 +157,31 @@
           "real_time_follow": "Real-time Follow"
         }
       },
-      "fuxingjue_viscera": { "name": "Fuxing Jue Viscera Selection" },
-      "symptom_selector": { "name": "Symptom Selector" },
-      "shanghan_channel": { "name": "Shang Han Channel" },
-      "shanghan_syndrome_selector": { "name": "Shang Han Syndrome Selection" },
-      "shanghan_formula_selector": { "name": "Shang Han Formula Selection" }
+      "fuxingjue_viscera": {
+        "name": "Fuxing Jue Viscera Selection"
+      },
+      "symptom_selector": {
+        "name": "Symptom Selector"
+      },
+      "shanghan_channel": {
+        "name": "Shang Han Channel"
+      },
+      "shanghan_syndrome_selector": {
+        "name": "Shang Han Syndrome Selection"
+      },
+      "shanghan_formula_selector": {
+        "name": "Shang Han Formula Selection"
+      }
     },
     "date": {
-      "date_navigator": { "name": "Base Date Switch" }
+      "date_navigator": {
+        "name": "Base Date Switch"
+      }
     },
     "text": {
-      "liuyaozhanbu_input": { "name": "Liu Yao Zhan Bu Text Input" }
+      "liuyaozhanbu_input": {
+        "name": "Liu Yao Zhan Bu Text Input"
+      }
     }
   }
 }

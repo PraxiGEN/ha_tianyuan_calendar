@@ -164,7 +164,6 @@ class 天元农历逻辑类:
     def 获取更多实体类(农历: Lunar, 真太阳时: datetime, 性别: str) -> dict:
         """组装更多农历扩展实体"""
         八字 = 农历.getEightChar()
-        前缀 = "乾造" if 性别 == "男" else "坤造"
         关系 = 天元农历逻辑类.计算生肖动合关系类(农历.getDayZhiExact2())
         
         return {
@@ -181,7 +180,7 @@ class 天元农历逻辑类:
                 }
             },
             "四柱八字数据": {
-                "state": f"{前缀} {八字.toString()}",
+                "state": 八字.toString(),
                 "attributes": {
                     "五行": f"{八字.getYearWuXing()}, {八字.getMonthWuXing()}, {八字.getDayWuXing()}, {八字.getTimeWuXing()}",
                     "纳音": f"{八字.getYearNaYin()}, {八字.getMonthNaYin()}, {八字.getDayNaYin()}, {八字.getTimeNaYin()}",

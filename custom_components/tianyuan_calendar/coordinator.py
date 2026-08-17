@@ -10,7 +10,7 @@ from typing import Any, TypedDict
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 from homeassistant.components.calendar import CalendarEvent
 # 农历库
@@ -114,6 +114,7 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             LOGGER,
             name=DOMAIN,
             update_interval=timedelta(minutes=刷新间隔分钟),
+            config_entry=entry,
         )
 
     # 真太阳时计算
@@ -130,60 +131,71 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     # 异步更新主入口：负责调度缓存逻辑
     async def _async_update_data(self) -> TianYuanData:
         """主计算任务：协调缓存与实时逻辑"""
-        当前时间 = dt_util.now()
-        实时模式 = self.查看日期 is None
-        基准时间 = 当前时间 if 实时模式 else datetime.combine(self.查看日期, 当前时间.time()).replace(tzinfo=当前时间.tzinfo)
+        try:
+            当前时间 = dt_util.now()
+            实时模式 = self.查看日期 is None
+            基准时间 = 当前时间 if 实时模式 else datetime.combine(self.查看日期, 当前时间.time()).replace(tzinfo=当前时间.tzinfo)
 
-        模式 = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
-        经度 = float(self.entry.options.get(CONF_CUSTOM_LONGITUDE, 120.0))
-        开启岐黄 = self.entry.options.get(CONF_ENABLE_QIHUANG, False)
-        开启术数 = self.entry.options.get(CONF_ENABLE_SHUSHU, False)
+            模式 = self.entry.options.get(CONF_CALC_MODE, MODE_ST)
+            经度 = float(self.entry.options.get(CONF_CUSTOM_LONGITUDE, 120.0))
+            开启岐黄 = self.entry.options.get(CONF_ENABLE_QIHUANG, False)
+            开启术数 = self.entry.options.get(CONF_ENABLE_SHUSHU, False)
 
-        # 实时计算真太阳时
-        标准农历 = Lunar.fromDate(基准时间)
-        真太阳时 = self._计算真太阳时类(基准时间, 经度)
-        真太阳时农历 = Lunar.fromDate(真太阳时)
-        tst_date_str = 真太阳时.strftime('%Y-%m-%d')
-        时辰名 = 真太阳时农历.getTimeZhi()
+            # 实时计算真太阳时
+            标准农历 = Lunar.fromDate(基准时间)
+            真太阳时 = self._计算真太阳时类(基准时间, 经度)
+            真太阳时农历 = Lunar.fromDate(真太阳时)
+            tst_date_str = 真太阳时.strftime('%Y-%m-%d')
+            时辰名 = 真太阳时农历.getTimeZhi()
 
-        # 获取日级缓存
-        day_key = f"D_{tst_date_str}_{模式}"
-        日级数据 = await self._cache.get_or_set(
-            day_key,
-            lambda: self.hass.async_add_executor_job(self._获取同步日级基础数据类, 真太阳时, 基准时间, 模式),
-            ttl=86400
-        )
-        数据: TianYuanData = 日级数据.copy()
-
-        # 获取时级缓存 (仅在相关开关开启时触发)
-        if 开启岐黄 or 开启术数:
-            hour_key = f"H_{tst_date_str}_{时辰名}_{self.性别}_{模式}"
-            时级数据 = await self._cache.get_or_set(
-                hour_key,
-                lambda: self.hass.async_add_executor_job(self._获取同步时级动态数据类, 真太阳时, 模式),
-                ttl=7200
+            # 获取日级缓存（key 含经度：改经度后无需依赖整集成 reload 来清空缓存）
+            day_key = f"D_{tst_date_str}_{经度}_{模式}"
+            日级数据 = await self._cache.get_or_set(
+                day_key,
+                lambda: self.hass.async_add_executor_job(self._获取同步日级基础数据类, 真太阳时, 基准时间, 模式),
+                ttl=86400
             )
-            if 时级数据:
-                # 根据开关合并数据
-                if 开启岐黄:
-                    数据.update({k: v for k, v in 时级数据.items() if k in [
-                        "纳甲筮法数据", "纳子筮法数据", "灵龟八法数据", "飞腾八法数据", 
-                        "迎随补泻数据", "六步气机数据", "年度运气总览数据"
-                    ]})
-                if 开启术数:
-                    数据.update({k: v for k, v in 时级数据.items() if k in [
-                        "小六壬数据", "梅花易数数据", "皇极经世数据"
-                    ]})
+            数据: TianYuanData = 日级数据.copy()
 
-        # 实时计算与覆盖 (处理 UI 实时交互)
-        # 获取“更多实体”字典包
+            # 获取时级缓存 (仅在相关开关开启时触发)
+            if 开启岐黄 or 开启术数:
+                hour_key = f"H_{tst_date_str}_{时辰名}_{self.性别}_{模式}"
+                时级数据 = await self._cache.get_or_set(
+                    hour_key,
+                    lambda: self.hass.async_add_executor_job(self._获取同步时级动态数据类, 真太阳时, 模式),
+                    ttl=7200
+                )
+                if 时级数据:
+                    # 根据开关合并数据
+                    if 开启岐黄:
+                        数据.update({k: v for k, v in 时级数据.items() if k in [
+                            "纳甲筮法数据", "纳子筮法数据", "灵龟八法数据", "飞腾八法数据",
+                            "迎随补泻数据", "六步气机数据", "年度运气总览数据"
+                        ]})
+                    if 开启术数:
+                        数据.update({k: v for k, v in 时级数据.items() if k in [
+                            "小六壬数据", "梅花易数数据", "皇极经世数据"
+                        ]})
+
+            # 实时计算与覆盖 (处理 UI 实时交互)：同步计算交给 executor，避免阻塞事件循环
+            实时覆盖数据 = await self.hass.async_add_executor_job(
+                self._获取同步实时覆盖数据类, 真太阳时, 标准农历, 实时模式, 数据, self.选中卦名
+            )
+            数据.update(实时覆盖数据)
+
+            return 数据
+        except UpdateFailed:
+            raise
+        except Exception as err:
+            raise UpdateFailed(f"天元历法计算失败: {err}") from err
+
+    def _获取同步实时覆盖数据类(self, 真太阳时: datetime, 标准农历: Lunar, 实时模式: bool, 日级数据: dict, 选中卦名: str | None) -> dict:
+        """实时覆盖数据计算（同步，运行于 executor 线程）"""
+        真太阳时农历 = Lunar.fromDate(真太阳时)
         更多实体包 = 天元农历逻辑类.获取更多实体类(真太阳时农历, 真太阳时, self.性别)
-        
-        # 确定展示卦名
-        当前时卦名 = 数据.get("梅花易数数据", {}).get("state")
-        显示卦名 = self.选中卦名 if self.选中卦名 else 当前时卦名
-
-        数据.update({
+        当前时卦名 = 日级数据.get("梅花易数数据", {}).get("state")
+        显示卦名 = 选中卦名 if 选中卦名 else 当前时卦名
+        return {
             "真太阳时": 真太阳时,
             "实时模式": 实时模式,
             "性别": self.性别,
@@ -192,12 +204,10 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             "十二时辰数据": 天元农历逻辑类.获取十二时辰数据类(标准农历),
             "易经名称数据": 显示卦名,
             "易经信息数据": 易经详注类.获取详注包装类(显示卦名),
-            "六爻爻法数据": 六爻占卜类.执行占卜流程类(self.六爻输入字符串, 数据["农历"]),
+            "六爻爻法数据": 六爻占卜类.执行占卜流程类(self.六爻输入字符串, 日级数据["农历"]),
             "辅行诀结果数据": 辅行诀脏腑用药法要类.辅行诀选方类(self.辅行诀选中症状),
-            "伤寒结果数据": 伤寒杂病论类.获取方剂数据类(self.伤寒选中方名)
-        })
-
-        return 数据
+            "伤寒结果数据": 伤寒杂病论类.获取方剂数据类(self.伤寒选中方名),
+        }
 
     # 静态构建器：增加 模式(mode) 参数支持
     def _获取同步日级基础数据类(self, 真太阳时: datetime, 基准时间: datetime, 模式: str) -> dict:
@@ -359,12 +369,11 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     def device_info(self):
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry.entry_id)},
-            name="TianYuan Lunar",
             translation_key="tianyuan_lunar",
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",
-            configuration_url="https://github.com/hzonz/ha_tianyuan_calendar",
+            configuration_url="https://github.com/PraxiGEN/ha_tianyuan_calendar",
             model="察日月之度，定岁时之序。",
         )
 
@@ -372,7 +381,6 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     def qihuang_device_info(self):
         return DeviceInfo(
             identifiers={(DOMAIN, f"{self.entry.entry_id}_qihuang")},
-            name="TianYuan Qihuang",
             translation_key="tianyuan_qihuang",
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
@@ -385,7 +393,6 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
     def shushu_device_info(self):
         return DeviceInfo(
             identifiers={(DOMAIN, f"{self.entry.entry_id}_shushu")},
-            name="TianYuan Shushu",
             translation_key="tianyuan_shushu",
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),

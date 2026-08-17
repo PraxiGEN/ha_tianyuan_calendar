@@ -132,7 +132,6 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
 
             self._temp_options.update(user_input)
-            self._temp_options.pop(CONF_ENABLE_SHENGRI, None)
             return self.async_create_entry(title="", data=self._temp_options)
 
         opts = self.config_entry.options
@@ -149,4 +148,4 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
                     )
                 ),
             })
-        ) 
+        )
