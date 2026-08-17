@@ -13,6 +13,7 @@ from custom_components.tianyuan_calendar.const import (
     CONF_ENABLE_SHUSHU,
     CONF_ENABLE_SHENGRI,
     CONF_CALC_MODE,
+    MODE_ST,
 )
 
 

@@ -32,7 +32,7 @@ class FakeLunar:
 def make_coordinator(data: dict | None = None, **kwargs) -> MagicMock:
     """构造一个 MagicMock 充当 coordinator，提供各实体读取所需的属性。"""
     co = MagicMock()
-    co.data = data if data is not None else {}
+    co.data = data
     co.last_update_success = True
     co.性别 = kwargs.get("性别", "男")
     co.选中卦名 = kwargs.get("选中卦名", None)
