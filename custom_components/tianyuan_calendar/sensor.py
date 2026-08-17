@@ -280,7 +280,9 @@ class TianYuanGenericSensor(TianYuanSensorBase):
         key = self.entity_description.key
 
         if key == "main_lunar":
-            l = self.coordinator.data["农历"]
+            l = self.coordinator.data.get("农历")
+            if l is None:
+                return None
             return f"{l.getMonthInChinese()}月{l.getDayInChinese()}"
 
         data_key = self.entity_description.data_key

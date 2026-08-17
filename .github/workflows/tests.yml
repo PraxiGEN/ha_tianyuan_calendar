@@ -23,6 +23,8 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
+          # 集成运行期依赖（manifest.json requirements），测试导入链会触发 lunar_python
+          pip install "lunar-python==1.4.8"
           pip install pytest-homeassistant-custom-component
 
       - name: Run pytest
