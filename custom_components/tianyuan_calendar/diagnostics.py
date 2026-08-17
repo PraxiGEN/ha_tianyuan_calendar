@@ -1,4 +1,4 @@
-"""Diagnostics support for TianYuan Calendar."""
+"""TianYuan 集成诊断支持."""
 from __future__ import annotations
 
 from typing import Any
