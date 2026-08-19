@@ -48,3 +48,18 @@ OPTION_ICHING_SYNC = "real_time_follow"
 
 # 默认值
 DEFAULT_REFRESH_INTERVAL: Final = 1  # 默认刷新频率 (分钟)
+
+# 按归属子设备分类，用于开关关闭 / 系统令牌失效时清理
+QIHUANG_PRIVATE_KEYS: Final = {
+    "fuxingjue_viscera",
+    "symptom_selector",
+    "shanghan_channel",
+    "shanghan_syndrome_selector",
+    "shanghan_formula_selector",
+    "fuxingjue_zangfu_yongyaofa",
+    "shanghan_zabinglun",
+}
+SHUSHU_PRIVATE_KEYS: Final = {
+    "liuyaozhanbu_input",
+    "liuyao_shifa",
+}
