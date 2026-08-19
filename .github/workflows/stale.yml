@@ -26,11 +26,11 @@ jobs:
           # === Timing / 时间设置 ===
           # Days of inactivity before an issue is marked stale
           # 问题无活动多少天后标记为过期
-          days-before-stale: 60
+          days-before-stale: 15
 
           # Days after being marked stale before the issue is closed
           # 标记为过期后多少天关闭问题
-          days-before-close: 7
+          days-before-close: 5
 
           # Only process issues, not pull requests
           # 仅处理问题，不处理拉取请求
@@ -49,14 +49,14 @@ jobs:
 
           # === Messages (bilingual) / 消息（双语）===
           stale-issue-message: >-
-            This issue has been inactive for 60 days and is being marked as stale.
-            该问题已 60 天无活动，正在标记为过期。
+            This issue has been inactive for 15 days and is being marked as stale.
+            该问题已 15 天无活动，正在标记为过期。
 
             If this issue is still relevant, please leave a comment to keep it open.
             如果此问题仍然相关，请留言以保持其开启状态。
 
-            Otherwise, it will be closed in 7 days.
-            否则，将在 7 天后自动关闭。
+            Otherwise, it will be closed in 5 days.
+            否则，将在 5 天后自动关闭。
 
           close-issue-message: >-
             This issue was closed due to prolonged inactivity after being marked stale.
