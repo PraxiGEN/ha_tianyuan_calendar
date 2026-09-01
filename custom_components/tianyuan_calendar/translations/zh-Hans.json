@@ -21,6 +21,7 @@
           "refresh_interval": "刷新频率 (分钟)",
           "calc_mode": "计算基准模式",
           "enable_more": "开启更多高级实体",
+          "enable_card": "开启前端卡片资源",
           "enable_qihuang": "开启天元岐黄",
           "enable_shushu": "开启天元术数",
           "manage_birthdays": "配置/修改生日清单",

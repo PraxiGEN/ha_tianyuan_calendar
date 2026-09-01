@@ -21,6 +21,7 @@
           "refresh_interval": "Refresh Interval (minutes)",
           "calc_mode": "Calculation Mode",
           "enable_more": "Enable Additional Advanced Entities",
+          "enable_card": "Enable Frontend Card Resource",
           "enable_qihuang": "Enable TianYuan Qihuang",
           "enable_shushu": "Enable TianYuan Divination",
           "manage_birthdays": "Manage Birthdays List",
