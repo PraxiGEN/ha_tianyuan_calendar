@@ -3,7 +3,7 @@ import lzma
 import base64
 import os
 import hashlib
-from ..const import RETRY_DELAY_MAP
+from ...const import RETRY_DELAY_MAP
 
 class _ShushuAssetEngine:
     """资源解析核心引擎"""

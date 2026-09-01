@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import re
 from datetime import date, timedelta
-from typing import Any
 from homeassistant.components.calendar import CalendarEvent
 from lunar_python import Lunar, Solar
 
@@ -21,7 +20,6 @@ class 天元日历逻辑类:
         假期 = 假期包.get("attributes", {})
         节气 = 节气包.get("attributes", {})
         
-
         农历描述 = (
             f"【历法】农历 {属性.get('农历')} · {属性.get('星期')}\n"
             f"【物候】{属性.get('物候')}\n"

@@ -16,7 +16,7 @@ from . import TianYuanConfigEntry
 from .entity import TianYuanQihuangBaseEntity, TianYuanShushuBaseEntity
 from .coordinator import TianYuanCoordinator
 from .tianyuan import 易经详注类, 辅行诀脏腑用药法要类, 伤寒杂病论类
-from .tianyuan.maps_loader import 检查专业权限类
+from .tianyuan.library import 检查专业权限类
 from .const import (
     DOMAIN,
     CONF_ENABLE_QIHUANG,
