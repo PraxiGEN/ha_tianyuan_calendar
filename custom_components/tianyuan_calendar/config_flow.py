@@ -17,6 +17,7 @@ from .const import (
     CONF_ENABLE_QIHUANG,
     CONF_ENABLE_SHENGRI,
     CONF_ENABLE_MORE,
+    CONF_ENABLE_CARD,
     CONF_CALC_MODE,
     CONF_BIRTHDAYS,
     MODE_ST,
@@ -43,6 +44,7 @@ class TianYuanConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_ENABLE_QIHUANG: False,
                 CONF_ENABLE_SHUSHU: False,   # 默认关闭
                 CONF_ENABLE_MORE: False,  # 默认关闭
+                CONF_ENABLE_CARD: False,  # 前端卡片默认关闭，避免全局注册
                 CONF_CALC_MODE: MODE_ST,  # 默认兼容模式
             }
             return self.async_create_entry(title="TianYuan 天元", data={}, options=options)
@@ -106,6 +108,7 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
             ),
             # 功能开关
             vol.Required(CONF_ENABLE_MORE, default=bool(opts.get(CONF_ENABLE_MORE, False))): selector.BooleanSelector(),
+            vol.Required(CONF_ENABLE_CARD, default=bool(opts.get(CONF_ENABLE_CARD, False))): selector.BooleanSelector(),
             vol.Required(CONF_ENABLE_QIHUANG, default=bool(opts.get(CONF_ENABLE_QIHUANG, False))): selector.BooleanSelector(),
             vol.Required(CONF_ENABLE_SHUSHU, default=bool(opts.get(CONF_ENABLE_SHUSHU, False))): selector.BooleanSelector(),
             vol.Optional(CONF_ENABLE_SHENGRI, default=False): selector.BooleanSelector(),

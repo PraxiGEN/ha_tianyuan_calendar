@@ -17,6 +17,7 @@ from .const import (
     LOGGER,
     CONF_ENABLE_QIHUANG,
     CONF_ENABLE_SHUSHU,
+    CONF_ENABLE_CARD,
     CONF_SYS_TOKEN,
     QIHUANG_PRIVATE_KEYS,
     SHUSHU_PRIVATE_KEYS,
@@ -32,19 +33,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> 
 
     integration = await async_get_integration(hass, DOMAIN)
     version = str(integration.version) if integration.version else "1.0.0"
-    # 注册前端资源（仅执行一次）
-    if f"{DOMAIN}_assets" not in hass.data:
-        local_path = hass.config.path("custom_components", DOMAIN, "www")
-        if os.path.exists(local_path):
-            # 暴露静态资源路径
-            await hass.http.async_register_static_paths([
-                StaticPathConfig(f"/{DOMAIN}-local", local_path, False)
-            ])
-            card_url = f"/{DOMAIN}-local/tianyuan-lunar-card.js?v={version}"
-            frontend.add_extra_js_url(hass, card_url)
-            LOGGER.info("TianYuan 卡片资源已注册: %s", card_url)
 
-        hass.data[f"{DOMAIN}_assets"] = True
+    # 前端卡片资源：仅当「前端卡片」开关开启时才注册静态路径并注入 JS，避免全局注册
+    if entry.options.get(CONF_ENABLE_CARD):
+        # 静态资源路径只注册一次（重复注册会抛错），用独立标志防重复
+        if f"{DOMAIN}_assets" not in hass.data:
+            local_path = hass.config.path("custom_components", DOMAIN, "www")
+            path_exists = await hass.async_add_executor_job(os.path.exists, local_path)
+            if path_exists:
+                await hass.http.async_register_static_paths([
+                    StaticPathConfig(f"/{DOMAIN}-local", local_path, False)
+                ])
+                # 注册资源 URL 携带集成版本号：升版后 URL 随之变化，自然绕开浏览器旧缓存
+                card_url = f"/{DOMAIN}-local/tianyuan-lunar-card.js?v={version}"
+                frontend.add_extra_js_url(hass, card_url)
+                LOGGER.info("TianYuan 卡片资源已注册: %s", card_url)
+            hass.data[f"{DOMAIN}_assets"] = True
+    else:
+        # 开关未启用：不向全局前端注入资源（避免无条件污染所有前端）
+        LOGGER.debug("前端卡片开关未启用，跳过 Lovelace 资源注册")
 
     coordinator = TianYuanCoordinator(hass, entry, version)
     await coordinator.async_config_entry_first_refresh()
