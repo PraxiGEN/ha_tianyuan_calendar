@@ -22,7 +22,7 @@ from .const import (
     SHUSHU_PRIVATE_KEYS,
 )
 from .coordinator import TianYuanCoordinator
-from .tianyuan.maps_loader import 检查专业权限类
+from .tianyuan.library import 检查专业权限类
 
 # 定义配置条目类型
 type TianYuanConfigEntry = ConfigEntry[TianYuanCoordinator]

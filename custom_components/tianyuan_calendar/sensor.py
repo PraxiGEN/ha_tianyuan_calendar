@@ -10,7 +10,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
 from . import TianYuanConfigEntry
-from .tianyuan.maps_loader import 检查专业权限类
+from .tianyuan.library import 检查专业权限类
 from .entity import TianYuanBaseEntity, TianYuanQihuangBaseEntity, TianYuanShushuBaseEntity
 from .const import CONF_SYS_TOKEN, CONF_ENABLE_QIHUANG, CONF_ENABLE_MORE, CONF_ENABLE_SHUSHU
 from .coordinator import TianYuanCoordinator
