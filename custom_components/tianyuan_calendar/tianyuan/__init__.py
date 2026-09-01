@@ -1,7 +1,6 @@
 from .qihuang import 子午流注类, 五运六气类, 辅行诀脏腑用药法要类, 伤寒杂病论类
 from .shushu import 小六壬类, 梅花易数类, 皇极经世类, 六爻占卜类, 易经详注类
-from .calendar_logic import 天元日历逻辑类
-from .lunar_logic import 天元农历逻辑类
+from .lifa import 天元日历逻辑类, 天元农历逻辑类
 
 __all__ = [
     "子午流注类",

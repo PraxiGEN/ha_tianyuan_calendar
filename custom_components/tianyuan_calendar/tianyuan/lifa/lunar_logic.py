@@ -56,7 +56,6 @@ class 天元农历逻辑类:
                 continue
             显示列表.append(f)
 
-
         节日列表 = []
         for 偏移天数 in range(-42, 43):
             if 偏移天数 == 0: continue
