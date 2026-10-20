@@ -1,5 +1,5 @@
 {
   "name": "TianYuan Calendar",
-  "render_readme": true,
+  "country": "CN",
   "homeassistant": "2026.1.0"
 }
