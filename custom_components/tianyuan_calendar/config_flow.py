@@ -22,7 +22,7 @@ from .const import (
     CONF_BIRTHDAYS,
     MODE_ST,
     MODE_TST,
-    CONF_SYS_TOKEN,
+    CONF_PRO_FEATURES,
     DEFAULT_REFRESH_INTERVAL,
 )
 
@@ -79,13 +79,14 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
 
             self._temp_options.update(user_input)
-            
-            if not user_input.get(CONF_ENABLE_QIHUANG) or not user_input.get(CONF_ENABLE_SHUSHU):
-                self._temp_options[CONF_SYS_TOKEN] = ""
+
+            # 专业功能仅在岐黄与术数双开时可用；未双开时强制关闭，避免残留
+            if not (user_input.get(CONF_ENABLE_QIHUANG) and user_input.get(CONF_ENABLE_SHUSHU)):
+                self._temp_options[CONF_PRO_FEATURES] = False
 
             if user_input.get(CONF_ENABLE_SHENGRI):
                 return await self.async_step_birthdays()
-        
+
             return self.async_create_entry(title="", data=self._temp_options)
         
         # 获取当前已保存的选项
@@ -106,24 +107,25 @@ class TianYuanOptionsFlowHandler(config_entries.OptionsFlow):
                     translation_key=CONF_CALC_MODE
                 )
             ),
-            # 功能开关
-            vol.Required(CONF_ENABLE_MORE, default=bool(opts.get(CONF_ENABLE_MORE, False))): selector.BooleanSelector(),
+            # 功能开关（声明顺序即界面显示顺序）
+            # 1. 前端卡片资源
             vol.Required(CONF_ENABLE_CARD, default=bool(opts.get(CONF_ENABLE_CARD, False))): selector.BooleanSelector(),
-            vol.Required(CONF_ENABLE_QIHUANG, default=bool(opts.get(CONF_ENABLE_QIHUANG, False))): selector.BooleanSelector(),
-            vol.Required(CONF_ENABLE_SHUSHU, default=bool(opts.get(CONF_ENABLE_SHUSHU, False))): selector.BooleanSelector(),
+            # 2. 生日清单入口（仅作进入生日管理页的门控）
             vol.Optional(CONF_ENABLE_SHENGRI, default=False): selector.BooleanSelector(),
+            # 3. 更多高级实体
+            vol.Required(CONF_ENABLE_MORE, default=bool(opts.get(CONF_ENABLE_MORE, False))): selector.BooleanSelector(),
+            # 4. 天元岐黄
+            vol.Required(CONF_ENABLE_QIHUANG, default=bool(opts.get(CONF_ENABLE_QIHUANG, False))): selector.BooleanSelector(),
+            # 5. 天元术数
+            vol.Required(CONF_ENABLE_SHUSHU, default=bool(opts.get(CONF_ENABLE_SHUSHU, False))): selector.BooleanSelector(),
         }
 
+        # 6. 专业功能开关：仅岐黄与术数双开时显示，追加在术数之后
         if opts.get(CONF_ENABLE_QIHUANG) and opts.get(CONF_ENABLE_SHUSHU):
-            schema_dict[vol.Optional(
-                CONF_SYS_TOKEN, 
-                default=opts.get(CONF_SYS_TOKEN, "")
-            )] = selector.TextSelector(
-                selector.TextSelectorConfig(
-                    type=selector.TextSelectorType.PASSWORD, 
-                    autocomplete="off"
-                )
-            )
+            schema_dict[vol.Required(
+                CONF_PRO_FEATURES,
+                default=bool(opts.get(CONF_PRO_FEATURES, False)),
+            )] = selector.BooleanSelector()
 
         return self.async_show_form(
             step_id="init",

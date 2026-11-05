@@ -16,22 +16,20 @@ from . import TianYuanConfigEntry
 from .entity import TianYuanQihuangBaseEntity, TianYuanShushuBaseEntity
 from .coordinator import TianYuanCoordinator
 from .tianyuan import 易经详注类, 辅行诀脏腑用药法要类, 伤寒杂病论类
-from .tianyuan.library import 检查专业权限类
 from .const import (
     DOMAIN,
     CONF_ENABLE_QIHUANG,
     CONF_ENABLE_SHUSHU,
+    CONF_PRO_FEATURES,
     SELECT_TYPE_GENDER,
     SELECT_TYPE_ICHING,
     OPTION_ICHING_SYNC,
-    CONF_SYS_TOKEN,
 )
 
 @dataclass(frozen=True, kw_only=True)
 class TianYuanSelectDescription(SelectEntityDescription):
     """自定义选择器描述符."""
     data_type: str
-    is_private: bool = False
 
 # 性别：UI 选项值(英文) 与 协调器内部值(中文) 的映射
 # 协调器内部始终以中文「男/女」存储，避免八字乾造/坤造判定错乱
@@ -59,6 +57,10 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         data_type=SELECT_TYPE_GENDER,
     ),
+)
+
+# 岐黄专业选择器（需岐黄主开关 + 专业功能开关同时开启）
+QIHUANG_PRO_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
     # 辅行诀级联
     TianYuanSelectDescription(
         key="fuxingjue_viscera",
@@ -66,7 +68,6 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         icon="mdi:account-heart-outline",
         data_type="fuxingjue_viscera",
         entity_category=EntityCategory.CONFIG,
-        is_private=True,
     ),
     TianYuanSelectDescription(
         key="symptom_selector",
@@ -74,7 +75,6 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         icon="mdi:emoticon-sick-outline",
         data_type="symptom",
         entity_category=EntityCategory.CONFIG,
-        is_private=True,
     ),
     # 伤寒论级联
     TianYuanSelectDescription(
@@ -83,7 +83,6 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         icon="mdi:pulse",
         data_type="shanghan_channel",
         entity_category=EntityCategory.CONFIG,
-        is_private=True,
     ),
     TianYuanSelectDescription(
         key="shanghan_syndrome_selector",
@@ -91,7 +90,6 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         icon="mdi:thermostat",
         data_type="shanghan_syndrome",
         entity_category=EntityCategory.CONFIG,
-        is_private=True,
     ),
     TianYuanSelectDescription(
         key="shanghan_formula_selector",
@@ -99,7 +97,6 @@ QIHUANG_SELECT_ENTITIES: tuple[TianYuanSelectDescription, ...] = (
         icon="mdi:mortar-pestle",
         data_type="shanghan_formula",
         entity_category=EntityCategory.CONFIG,
-        is_private=True,
     ),
 )
 
@@ -111,18 +108,19 @@ async def async_setup_entry(
     """根据配置动态加载选择器实体."""
     coordinator = entry.runtime_data
     conf = {**entry.data, **entry.options}
-    has_pro_access = 检查专业权限类(conf.get(CONF_SYS_TOKEN, ""))
+    pro_features_enabled = bool(conf.get(CONF_PRO_FEATURES))
     entities = []
 
     if conf.get(CONF_ENABLE_SHUSHU):
         for description in SHUSHU_SELECT_ENTITIES:
             entities.append(TianYuanShushuSelect(coordinator, entry, description))
-        
-    if conf.get(CONF_ENABLE_QIHUANG): 
+
+    if conf.get(CONF_ENABLE_QIHUANG):
         for description in QIHUANG_SELECT_ENTITIES:
-            if description.is_private and not has_pro_access:
-                continue
             entities.append(TianYuanQihuangSelect(coordinator, entry, description))
+        if pro_features_enabled:
+            for description in QIHUANG_PRO_SELECT_ENTITIES:
+                entities.append(TianYuanQihuangSelect(coordinator, entry, description))
 
     async_add_entities(entities)
 

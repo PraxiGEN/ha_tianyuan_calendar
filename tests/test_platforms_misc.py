@@ -28,7 +28,6 @@ def test_text_native_value_and_attrs() -> None:
         TianYuanTextEntityDescription(
             key="liuyaozhanbu_input",
             translation_key="liuyaozhanbu_input",
-            is_private=True,
         ),
     )
     assert e.native_value == "阳阳阳阴阴阴"
@@ -44,7 +43,6 @@ async def test_text_set_value() -> None:
         TianYuanTextEntityDescription(
             key="liuyaozhanbu_input",
             translation_key="liuyaozhanbu_input",
-            is_private=True,
         ),
     )
     await e.async_set_value("111000")

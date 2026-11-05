@@ -7,19 +7,17 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import TianYuanConfigEntry
-from .tianyuan.library import 检查专业权限类
 from .entity import TianYuanShushuBaseEntity
 from .coordinator import TianYuanCoordinator
-from .const import DOMAIN, CONF_SYS_TOKEN, CONF_ENABLE_SHUSHU
+from .const import CONF_ENABLE_SHUSHU, CONF_PRO_FEATURES
 
 @dataclass(frozen=True, kw_only=True)
 class TianYuanTextEntityDescription(TextEntityDescription):
     """文本实体描述符扩展"""
     # 以后如有需要可以在此扩展
-    is_private: bool = False
 
-# 定义描述符列表
-TIANYUAN_TEXT_ENTITIES: tuple[TianYuanTextEntityDescription, ...] = (
+# 术数专业文本实体（需术数主开关 + 专业功能开关同时开启）
+SHUSHU_PRO_TEXT_ENTITIES: tuple[TianYuanTextEntityDescription, ...] = (
     TianYuanTextEntityDescription(
         key="liuyaozhanbu_input",
 
@@ -28,7 +26,6 @@ TIANYUAN_TEXT_ENTITIES: tuple[TianYuanTextEntityDescription, ...] = (
         native_min=6, # 缩短最小长度以便调试
         native_max=40,
         pattern=r"^[01阳阴,\-\s123456]*$",
-        is_private=True,
     ),
 )
 
@@ -40,19 +37,15 @@ async def async_setup_entry(
     """根据配置设置文本输入实体."""
     coordinator = entry.runtime_data
     conf = {**entry.data, **entry.options}
-    has_pro_access = 检查专业权限类(conf.get(CONF_SYS_TOKEN, ""))
+    pro_features_enabled = bool(conf.get(CONF_PRO_FEATURES))
 
-    if not conf.get(CONF_ENABLE_SHUSHU):
+    if not conf.get(CONF_ENABLE_SHUSHU) or not pro_features_enabled:
         return
 
-    entities = []
-    
-    for description in TIANYUAN_TEXT_ENTITIES:
-
-        if getattr(description, "is_private", False) and not has_pro_access:
-            continue
-        
-        entities.append(TianYuanLiuYaoInput(coordinator, entry, description))
+    entities = [
+        TianYuanLiuYaoInput(coordinator, entry, description)
+        for description in SHUSHU_PRO_TEXT_ENTITIES
+    ]
 
     if entities:
         async_add_entities(entities)

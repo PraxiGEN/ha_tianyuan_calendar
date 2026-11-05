@@ -1,0 +1,10 @@
+# 统一行尾：仓库内所有文本文件一律以 LF 存储，检出时也保持 LF。
+# 目的：避免 Windows（CRLF）与 Linux / CI（LF）混合编辑时产生"整文件重写"的假 diff。
+* text=auto eol=lf
+
+# 二进制与编码资源：不参与行尾转换、不做文本 diff
+*.png binary
+*.jpg binary
+*.ico binary
+*.dat -text -diff
+*.pyc -text

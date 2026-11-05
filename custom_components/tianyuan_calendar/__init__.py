@@ -18,12 +18,11 @@ from .const import (
     CONF_ENABLE_QIHUANG,
     CONF_ENABLE_SHUSHU,
     CONF_ENABLE_CARD,
-    CONF_SYS_TOKEN,
-    QIHUANG_PRIVATE_KEYS,
-    SHUSHU_PRIVATE_KEYS,
+    CONF_PRO_FEATURES,
+    QIHUANG_PRO_KEYS,
+    SHUSHU_PRO_KEYS,
 )
 from .coordinator import TianYuanCoordinator
-from .tianyuan.library import 检查专业权限类
 
 # 定义配置条目类型
 type TianYuanConfigEntry = ConfigEntry[TianYuanCoordinator]
@@ -107,10 +106,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> 
             LOGGER.info("岐黄模式已关闭，正在清理岐黄设备...")
             device_registry.async_remove_device(device.id)
 
-    # 清理失效的自用实体：所属开关关闭或系统令牌失效时，移除对应私有实体，避免僵尸残留
+    # 清理失效的专业实体：专业开关关闭或所属主开关关闭时，移除对应实体，避免僵尸残留
     conf = {**entry.data, **entry.options}
-    has_pro_access = 检查专业权限类(conf.get(CONF_SYS_TOKEN, ""))
-    _cleanup_private_entities(hass, entry, has_pro_access)
+    pro_features_enabled = bool(conf.get(CONF_PRO_FEATURES))
+    _cleanup_pro_entities(hass, entry, pro_features_enabled)
 
     # 转发平台设置并监听更新
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -118,26 +117,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> 
 
     return True
 
-def _cleanup_private_entities(hass: HomeAssistant, entry: TianYuanConfigEntry, has_pro_access: bool) -> None:
-    """清除不再符合条件的自用实体，避免僵尸实体残留。"""
+def _cleanup_pro_entities(hass: HomeAssistant, entry: TianYuanConfigEntry, pro_features_enabled: bool) -> None:
+    """清除不再符合条件的专业实体，避免僵尸实体残留。"""
     reg = er.async_get(hass)
     conf = {**entry.data, **entry.options}
-    qihuang_available = bool(conf.get(CONF_ENABLE_QIHUANG)) and has_pro_access
-    shushu_available = bool(conf.get(CONF_ENABLE_SHUSHU)) and has_pro_access
+    qihuang_pro_available = bool(conf.get(CONF_ENABLE_QIHUANG)) and pro_features_enabled
+    shushu_pro_available = bool(conf.get(CONF_ENABLE_SHUSHU)) and pro_features_enabled
     for entity in list(er.async_entries_for_config_entry(reg, entry.entry_id)):
         uid = entity.unique_id
         if not uid or not uid.startswith(f"{entry.entry_id}_"):
             continue
         key = uid[len(entry.entry_id) + 1:]
         try:
-            if key in QIHUANG_PRIVATE_KEYS and not qihuang_available:
+            if key in QIHUANG_PRO_KEYS and not qihuang_pro_available:
                 reg.async_remove(entity.entity_id)
-                LOGGER.info("已清除岐黄自用实体: %s", entity.entity_id)
-            elif key in SHUSHU_PRIVATE_KEYS and not shushu_available:
+                LOGGER.info("已清除岐黄专业实体: %s", entity.entity_id)
+            elif key in SHUSHU_PRO_KEYS and not shushu_pro_available:
                 reg.async_remove(entity.entity_id)
-                LOGGER.info("已清除术数自用实体: %s", entity.entity_id)
+                LOGGER.info("已清除术数专业实体: %s", entity.entity_id)
         except Exception as err:  # 实体已被其它路径（如子设备删除）移除时静默跳过
-            LOGGER.debug("清理自用实体 %s 时忽略: %s", entity.entity_id, err)
+            LOGGER.debug("清理专业实体 %s 时忽略: %s", entity.entity_id, err)
 
 async def async_update_options(hass: HomeAssistant, entry: TianYuanConfigEntry) -> None:
     """当用户在集成选项中点击保存时触发。"""

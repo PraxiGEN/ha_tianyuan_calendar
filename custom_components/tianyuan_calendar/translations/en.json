@@ -25,7 +25,7 @@
           "enable_qihuang": "Enable TianYuan Qihuang",
           "enable_shushu": "Enable TianYuan Divination",
           "manage_birthdays": "Manage Birthdays List",
-          "system_token": "System Token"
+          "pro_features": "Enable Professional Features"
         }
       },
       "birthdays": {
