@@ -10,9 +10,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
 from . import TianYuanConfigEntry
-from .tianyuan.library import 检查专业权限类
 from .entity import TianYuanBaseEntity, TianYuanQihuangBaseEntity, TianYuanShushuBaseEntity
-from .const import CONF_SYS_TOKEN, CONF_ENABLE_QIHUANG, CONF_ENABLE_MORE, CONF_ENABLE_SHUSHU
+from .const import (
+    CONF_ENABLE_QIHUANG,
+    CONF_ENABLE_MORE,
+    CONF_ENABLE_SHUSHU,
+    CONF_PRO_FEATURES,
+)
 from .coordinator import TianYuanCoordinator
 from homeassistant.const import EntityCategory
 
@@ -20,7 +24,6 @@ from homeassistant.const import EntityCategory
 class TianYuanSensorEntityDescription(SensorEntityDescription):
     """扩展描述符，用于指定协调器中的数据键名."""
     data_key: str | None = None
-    is_private: bool = False
 
 # 基础实体
 DEFAULT_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
@@ -170,6 +173,10 @@ QIHUANG_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
         icon="mdi:book-open-page-variant", 
         data_key="年度运气总览数据"
     ),
+)
+
+# 岐黄专业实体（需岐黄主开关 + 专业功能开关同时开启）
+QIHUANG_PRO_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key="fuxingjue_zangfu_yongyaofa",
 
@@ -177,7 +184,6 @@ QIHUANG_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
         icon="mdi:medical-bag",
         data_key="辅行诀结果数据",
         entity_category=EntityCategory.DIAGNOSTIC,
-        is_private=True,
     ),
     # 伤寒杂病论建议
     TianYuanSensorEntityDescription(
@@ -187,7 +193,6 @@ QIHUANG_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
         icon="mdi:book-cross",
         data_key="伤寒结果数据",
         entity_category=EntityCategory.DIAGNOSTIC,
-        is_private=True,
     ),
 )
 
@@ -221,6 +226,10 @@ SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
         icon="mdi:book-open-variant",
         data_key="易经信息数据",
     ),
+)
+
+# 术数专业实体（需术数主开关 + 专业功能开关同时开启）
+SHUSHU_PRO_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
     TianYuanSensorEntityDescription(
         key="liuyao_shifa",
 
@@ -228,7 +237,6 @@ SHUSHU_SENSORS: tuple[TianYuanSensorEntityDescription, ...] = (
         icon="mdi:podium-gold",
         data_key="六爻爻法数据",
         entity_category=EntityCategory.DIAGNOSTIC,
-        is_private=True,
     ),
 )
 
@@ -241,7 +249,7 @@ async def async_setup_entry(
 
     coordinator = entry.runtime_data
     conf = {**entry.data, **entry.options}
-    has_pro_access = 检查专业权限类(conf.get(CONF_SYS_TOKEN, ""))
+    pro_features_enabled = bool(conf.get(CONF_PRO_FEATURES))
     entities = []
 
     # 基础实体
@@ -256,16 +264,18 @@ async def async_setup_entry(
     # 岐黄实体
     if conf.get(CONF_ENABLE_QIHUANG):
         for desc in QIHUANG_SENSORS:
-            if desc.is_private and not has_pro_access:
-                continue 
             entities.append(TianYuanQihuangSensor(coordinator, entry, desc))
+        if pro_features_enabled:
+            for desc in QIHUANG_PRO_SENSORS:
+                entities.append(TianYuanQihuangSensor(coordinator, entry, desc))
 
     # 术数实体
     if conf.get(CONF_ENABLE_SHUSHU):
         for desc in SHUSHU_SENSORS:
-            if desc.is_private and not has_pro_access:
-                continue 
             entities.append(TianYuanShushuSensor(coordinator, entry, desc))
+        if pro_features_enabled:
+            for desc in SHUSHU_PRO_SENSORS:
+                entities.append(TianYuanShushuSensor(coordinator, entry, desc))
 
     async_add_entities(entities)
 
