@@ -46,19 +46,23 @@
 
 ---
 
-## 🛠️ 传感器列表 (Entities)
+## 🛠️ 实体列表 (Entities)
+
+> 下表实体 ID 取自集成默认命名规则（`设备名 + 实体名` 经 Home Assistant 自动转写）。若你的实例曾重命名过设备、或从早期版本升级而来，历史实体 ID 会保留不随名称变化，请以 **开发者工具 → 实体** 中显示的 ID 为准。
 
 ### 1. 核心历法（默认添加）
 | 实体 ID | 名称 | 说明 |
 | :--- | :--- | :--- |
 | `sensor.tianyuan_nong_li_lunar_calendar` | **农历** | **状态**：显示当前农历。**属性**：包含所有农历信息。 |
-| `sensor.tianyuan_nong_li_holiday` | **假期信息** | **状态**：工作日/节假日。**属性**：当日节日、未来 10 个节假日深度预报。 |
-| `sensor.tianyuan_nong_li_solar_term` | **节气信息** | **状态**：今日节气或下个节气倒计时。**属性**：前后节气日期及精确时刻。 |
+| `sensor.tianyuan_nong_li_holiday` | **假期** | **状态**：工作日/节假日。**属性**：当日节日、未来 10 个节假日深度预报。 |
+| `sensor.tianyuan_nong_li_solar_term` | **节气** | **状态**：今日节气或下个节气倒计时。**属性**：前后节气日期及精确时刻。 |
 | `sensor.tianyuan_nong_li_shi_er_shi_chen` | **十二时辰** | **状态**：钟表时辰。**属性**：全天 12 时辰宜忌全表、干支及吉凶预报。 |
-| `calendar.tianyuan_nong_li_birthday_reminder` | **生日提醒** | **状态**：达成条件显示生日信息。**属性**：生日信息。 |
+| `calendar.tianyuan_nong_li_sheng_ri_ti_xing` | **生日提醒** | **状态**：达成条件显示生日信息。**属性**：生日信息。 |
 | `calendar.tianyuan_nong_li_tianyuan_calendar` | **天元历法** | **状态**：始终显示单日农历信息。**属性**：农历信息。 |
+| `button.tianyuan_nong_li_return_to_today` | **回到今天** | 将基准日期重置为今天。 |
+| `date.tianyuan_nong_li_base_date_switch` | **基准日期切换** | 设定一个基准日期，所有实体按该日期推算（便于查看历史/未来日期的农历）。 |
 
-### 2. 八字，冲煞等更多历法相关（需开启更多实体）
+### 2. 八字、冲煞等更多历法相关（需开启更多高级实体）
 | 实体 ID | 名称 | 说明 |
 | :--- | :--- | :--- |
 | `sensor.tianyuan_nong_li_four_pillars_of_destiny` | **四柱八字** | **状态**：显示乾造/坤造及四柱。**属性**：五行、纳音、十神、长生十二神(地势)、胎元、命宫、身宫。 |
@@ -71,36 +75,38 @@
 ### 3. 天元岐黄 (需开启天元岐黄)
 | 实体 ID | 名称 | 说明 |
 | :--- | :--- | :--- |
-| `sensor.tianyuan_lunar_najia` | **子午流注-纳甲** | 实时显示开穴经络、穴位、经络五行及天干。 |
-| `sensor.tianyuan_lunar_nazi` | **子午流注-纳子** | 实时展示当前时辰对应的循行经络。 |
-| `sensor.tianyuan_lunar_linggui` | **灵龟八法** | 依据真太阳时与性别计算的实时八法开穴数据。 |
+| `sensor.tianyuan_qi_huang_na_jia_shi_fa` | **纳甲筮法** | 实时显示开穴经络、穴位、经络五行及天干。 |
+| `sensor.tianyuan_qi_huang_na_zi_shi_fa` | **纳子筮法** | 实时展示当前时辰对应的循行经络。 |
+| `sensor.tianyuan_qi_huang_ling_gui_ba_fa` | **灵龟八法** | 依据真太阳时与性别计算的实时八法开穴数据。 |
 | `sensor.tianyuan_qi_huang_fei_teng_ba_fa` | **飞腾八法** | 依据真太阳时的实时八法开穴数据。 |
 | `sensor.tianyuan_qi_huang_ying_sui_bu_xie` | **迎随补泻** | 实时展示当前时辰对应的循行经络。 |
 | `sensor.tianyuan_qi_huang_liu_bu_qi_ji` | **六步气机** | 依据真太阳时的实时五运六气数据。 |
 | `sensor.tianyuan_qi_huang_nian_du_wu_yun_liu_qi_zong_lan` | **年度五运六气总览** | 依据真太阳时的实时五运六气数据。 |
+| `select.tianyuan_qi_huang_ziwu_flow_gender_selection` | **子午流注性别选择** | 选择性别，灵龟八法按此计算开穴。 |
 
 ### 4. 天元术数 (需开启天元术数)
 | 实体 ID | 名称 | 说明 |
 | :--- | :--- | :--- |
-| `sensor.tianyuan_shushu_xiaoliuren` | **小六壬时卦** | 依据月日时计算的时卦数据。 |
-| `sensor.tianyuan_shushu_hourly_hexagram` | **梅花易数时卦** | 依据年月日时计算的时卦数据。 |
-| `sensor.tianyuan_shushu_monthly_hexagram` | **皇极经世值月卦** | 依据年月计算的皇极经世数据。 |
-| `sensor.tianyuan_shushu_i_ching` | **易经卦象** | 实时展示基于梅花易数计算结果的卦的完整卦辞。 |
+| `sensor.tianyuan_zhu_shu_xiao_liu_ren_shi_gua` | **小六壬时卦** | 依据月日时计算的时卦数据。 |
+| `sensor.tianyuan_zhu_shu_mei_hua_yi_shu_shi_gua` | **梅花易数时卦** | 依据年月日时计算的时卦数据。 |
+| `sensor.tianyuan_zhu_shu_huang_ji_jing_shi_zhi_yue_gua` | **皇极经世月卦** | 依据年月计算的皇极经世数据。 |
+| `sensor.tianyuan_zhu_shu_i_ching_hexagram` | **易经卦象** | 实时展示基于梅花易数计算结果的卦的完整卦辞。 |
+| `select.tianyuan_zhu_shu_i_ching_reading_selector` | **易经查阅选择** | 手动指定卦名查阅详注，或选择“实时随动”跟随当前卦象。 |
 
 ### 5. 专业功能 (需开启专业功能，且「天元岐黄」与「天元术数」同时开启)
 实体归属对应子设备：辅行诀 / 伤寒相关归 **天元岐黄**，六爻相关归 **天元术数**。
 
 | 实体 ID | 名称 | 说明 |
 | :--- | :--- | :--- |
-| `sensor.tianyuan_qi_huang_fu_xing_jue_zang_fu_yong_yao_fa` | **辅行诀脏腑用药法** | **状态**：依所选脏腑与症状输出的用药建议。**属性**：脏腑、症状、方剂与加减。 |
+| `sensor.tianyuan_qi_huang_fuxing_jue_zang_fu_yong_yao_fa` | **辅行诀脏腑用药法** | **状态**：依所选脏腑与症状输出的用药建议。**属性**：脏腑、症状、方剂与加减。 |
 | `sensor.tianyuan_qi_huang_shang_han_za_bing_lun` | **伤寒杂病论** | **状态**：依所选六经、症状、方剂输出的辨证结果。**属性**：六经、症状、方剂与条文。 |
-| `sensor.tianyuan_zhu_shu_liu_yao_shi_fa` | **六爻筮法** | **状态**：依录入爻象得出的断卦结果。**属性**：本卦、变卦、动爻与断语。 |
-| `select.tianyuan_qi_huang_fu_xing_jue_da_lei_xuan_ze` | **辅行诀大类选择** | 选择脏腑大类，驱动下方症状选择。 |
-| `select.tianyuan_qi_huang_fu_xing_jue_zheng_zhuang_xuan_ze` | **辅行诀症状选择** | 选择具体症状，驱动辅行诀结果。 |
-| `select.tianyuan_qi_huang_shang_han_liu_jing_xuan_ze` | **伤寒六经选择** | 选择六经（太阳、阳明、少阳、太阴、少阴、厥阴）。 |
-| `select.tianyuan_qi_huang_shang_han_zheng_zhuang_xuan_ze` | **伤寒症状选择** | 选择六经下的症状。 |
-| `select.tianyuan_qi_huang_shang_han_fang_ji_xuan_ze` | **伤寒方剂选择** | 选择对应方剂，驱动伤寒结果。 |
-| `text.tianyuan_zhu_shu_liu_yao_shi_fa_wen_ben_shu_ru` | **六爻筮法文本输入** | 录入爻象（阴/阳、数字或 0/1），长度 6–40，驱动六爻结果。 |
+| `sensor.tianyuan_zhu_shu_liu_yao_shi_fa_zhan_bu` | **六爻筮法** | **状态**：依录入爻象得出的断卦结果。**属性**：本卦、变卦、动爻与断语。 |
+| `select.tianyuan_qi_huang_fuxing_jue_viscera_selection` | **辅行诀大类选择** | 选择脏腑大类，驱动下方症状选择。 |
+| `select.tianyuan_qi_huang_symptom_selector` | **辅行诀症状选择** | 选择具体症状，驱动辅行诀结果。 |
+| `select.tianyuan_qi_huang_shang_han_channel` | **伤寒六经选择** | 选择六经（太阳、阳明、少阳、太阴、少阴、厥阴）。 |
+| `select.tianyuan_qi_huang_shang_han_syndrome_selection` | **伤寒症状选择** | 选择六经下的症状。 |
+| `select.tianyuan_qi_huang_shang_han_formula_selection` | **伤寒方剂选择** | 选择对应方剂，驱动伤寒结果。 |
+| `text.tianyuan_zhu_shu_liu_yao_zhan_bu_text_input` | **六爻筮法文本输入** | 录入爻象（阴/阳、数字或 0/1），长度 6–40，驱动六爻结果。 |
 
 > 上述实体在「专业功能」关闭、或岐黄/术数任一主开关关闭时会被自动移除（含注册表记录），重新开启即恢复，历史记录不受影响。
 
