@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/github/v/release/PraxiGEN/ha_tianyuan_calendar)](https://github.com/PraxiGEN/ha_tianyuan_calendar/releases)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/PraxiGEN/ha_tianyuan_calendar/blob/main/LICENSE)
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Available-blue.svg)](https://www.hacs.xyz/docs/marketplace/)
 ![](https://komarev.com/ghpvc/?username=PraxiGEN&color=ff69b4)
 
 ## 天元历法不再仅仅是历法传感器，它是一个深度整合中国传统“天文、术数、医学”的智能引擎。通过真太阳时修正，为用户提供精确的排盘、取穴与卦象预测。
@@ -41,27 +41,32 @@
   
 ## 📦 安装
 
-### 通过HACS安装（推荐）
+### 通过市场安装（推荐）
 
-1. 在HACS的"集成"部分，点击右上角的三点菜单
-2. 选择"自定义存储库"
-3. 在存储库字段输入：
+> 自 Home Assistant **2026.11** 起，HACS 已内置为系统自带的 **市场（Marketplace）**，位于 **设置 > 市场**，无需另行安装。
+
+一键安装：
+
+[![在 Home Assistant 市场中打开 天元历法。](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=PraxiGEN&repository=ha_tianyuan_calendar&category=integration)
+
+**或者手动操作：**
+
+1. 打开 Home Assistant，进入 **设置 > 市场**
+2. 搜索 **“天元历法”**（或 `TianYuan`）
+3. 进入详情页，点击 **安装**
+4. 安装完成后会**直接进入配置向导**，填好经度与刷新频率即可使用
+
+> 安装后**无需重启**：集成带配置向导，安装完成即加载并直接引导你完成配置。只有在更新已安装的集成后，系统才会提示重启（按提示操作即可）。
+
+### 手动安装（离线/无市场环境）
+
+1. 下载最新的 Release：
 ```yaml
 https://github.com/PraxiGEN/ha_tianyuan_calendar
 ```
-4. 类别选择"集成"
-5. 点击"添加"保存
-6. 在HACS中找到"天元历法"集成并点击安装
-7. 重启Home Assistant
-
-### 手动安装
-
-1. 下载最新的:
-```yaml
-https://github.com/PraxiGEN/ha_tianyuan_calendar
-```
-2. 解压并将`custom_components/tianyuan_calendar`文件夹放入Home Assistant的`custom_components`目录
-3. 重启Home Assistant
+2. 解压并将 `custom_components/tianyuan_calendar` 文件夹放入 Home Assistant 的 `custom_components` 目录
+3. 重启 Home Assistant
+4. 前往 **设置 > 设备与服务 > 添加集成**，搜索 **天元历法** 完成配置
 
 ## 📖 文档导航
 - [🚀 详细配置与使用教程 (DOCS.md)](md/DOCS.md)
