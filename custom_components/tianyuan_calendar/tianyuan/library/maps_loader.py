@@ -2,8 +2,7 @@ import json
 import lzma
 import base64
 import os
-import hashlib
-from ...const import RETRY_DELAY_MAP
+from ...const import ICHING_DECODE_MAP
 
 class _ShushuAssetEngine:
     """资源解析核心引擎"""
@@ -15,7 +14,7 @@ class _ShushuAssetEngine:
         """生成逆向置换盒"""
         if cls._inv_sbox is None:
             cls._inv_sbox = [0] * 256
-            for i, v in enumerate(RETRY_DELAY_MAP):
+            for i, v in enumerate(ICHING_DECODE_MAP):
                 cls._inv_sbox[v] = i
         return cls._inv_sbox
 
@@ -71,13 +70,3 @@ def 获取单卦详注类(卦名: str) -> dict:
 def 获取所有卦名列表类() -> list:
     lib = _ShushuAssetEngine.load_master_package().get("iching_details", {})
     return list(lib.keys())
-
-def 获取系统校验码法():
-    maps = 加载全量映射表类()
-    return maps.get("system_internal_checksum", "")
-
-def 检查专业权限类(token: str) -> bool:
-    if not token:
-        return False
-    secret_hash = 获取系统校验码法()
-    return hashlib.sha256(token.encode()).hexdigest() == secret_hash
