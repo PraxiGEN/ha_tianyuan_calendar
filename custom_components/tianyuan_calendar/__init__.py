@@ -27,6 +27,10 @@ from .coordinator import TianYuanCoordinator
 # 定义配置条目类型
 type TianYuanConfigEntry = ConfigEntry[TianYuanCoordinator]
 
+def _find_device(registry: dr.DeviceRegistry, entry_id: str, ident: tuple[str, str]) -> dr.DeviceEntry | None:
+    """按标识符在配置项设备中查找，替代弃用的 async_get_device。"""
+    return next((d for d in dr.async_entries_for_config_entry(registry, entry_id) if ident in d.identifiers), None)
+
 async def async_setup_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> bool:
     """设置 TianYuan 集成实例."""
 
@@ -62,7 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> 
     main_device_ident = (DOMAIN, entry.entry_id)
     shushu_device_ident = (DOMAIN, f"{entry.entry_id}_shushu")
     qihuang_device_ident = (DOMAIN, f"{entry.entry_id}_qihuang") # 新增：岐黄设备ID
-    # 显式注册主设备，确保子设备通过 via_device 关联时主设备已存在且名称可本地化
+    # 三设备平级独立注册：服务集成无硬件拓扑，via_device 属弃用 API（2027.8 移除），不接父子链
     device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={main_device_ident},
@@ -73,38 +77,42 @@ async def async_setup_entry(hass: HomeAssistant, entry: TianYuanConfigEntry) -> 
     )
 
     # 可选/隐私实体采用「按需创建」策略：
+    shushu_device = qihuang_device = None
     if entry.options.get(CONF_ENABLE_SHUSHU):
         # 开启时：创建/更新术数设备
-        device_registry.async_get_or_create(
+        shushu_device = device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
             identifiers={shushu_device_ident},
             translation_key="tianyuan_shushu",
             manufacturer="TianYuan Calendar",
             sw_version=version,
-            via_device=main_device_ident,
         )
     else:
-        device = device_registry.async_get_device(identifiers={shushu_device_ident})
+        device = _find_device(device_registry, entry.entry_id, shushu_device_ident)
         if device:
             LOGGER.info("术数模式已关闭，正在清理术数设备...")
             device_registry.async_remove_device(device.id)
 
     if entry.options.get(CONF_ENABLE_QIHUANG):
         # 开启时：创建/更新岐黄设备
-        device_registry.async_get_or_create(
+        qihuang_device = device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
             identifiers={qihuang_device_ident},
             translation_key="tianyuan_qihuang",
             manufacturer="TianYuan Calendar",
             sw_version=version,
-            via_device=main_device_ident,
         )
     else:
         # 关闭时：清理岐黄设备
-        device = device_registry.async_get_device(identifiers={qihuang_device_ident})
+        device = _find_device(device_registry, entry.entry_id, qihuang_device_ident)
         if device:
             LOGGER.info("岐黄模式已关闭，正在清理岐黄设备...")
             device_registry.async_remove_device(device.id)
+
+    # 清空存量安装残留的 via_device_id：注册时省略该参数不会清除旧值，须显式置空
+    for device in (shushu_device, qihuang_device):
+        if device and device.via_device_id:
+            device_registry.async_update_device(device.id, via_device_id=None)
 
     # 清理失效的专业实体：专业开关关闭或所属主开关关闭时，移除对应实体，避免僵尸残留
     conf = {**entry.data, **entry.options}

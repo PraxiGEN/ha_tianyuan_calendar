@@ -396,7 +396,6 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",
-            via_device=(DOMAIN, self.entry.entry_id),
             model="法于阴阳，和于术数，以通天人之纪。",
         )   
 
@@ -408,6 +407,5 @@ class TianYuanCoordinator(DataUpdateCoordinator[TianYuanData]):
             manufacturer="TianYuan Calendar",
             sw_version=str(self.version),
             entry_type="service",
-            via_device=(DOMAIN, self.entry.entry_id),
             model="观天之道，执天之行，尽矣。",
         )
